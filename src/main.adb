@@ -44,8 +44,22 @@ with LCD_Std_Out;
 
 procedure Main
 is
+   type My_Vector is record
+   X : Integer;
+   Y : Integer;
+   end record;
+   
+   function VectorToPoint(V: My_Vector) return Point is
+      ret : Point := (Natural(V.X), Natural(V.Y));
+   begin
+      return ret;
+   end;
+   
    BG : Bitmap_Color := (Alpha => 255, others => 0);
-   Ball_Pos   : Point := (20, 280);
+   Ball_Pos   : My_Vector := (20, 280);
+   Ball_Direction_X: Integer := 7;
+   Ball_Direction_Y: Integer := 3;
+   radius : Integer := 10;
 begin
 
    --  Initialize LCD
@@ -77,9 +91,30 @@ begin
       Display.Hidden_Buffer (1).Fill;
 
       Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Blue);
-      Display.Hidden_Buffer (1).Fill_Circle (Ball_Pos, 10);
+      
+      Display.Hidden_Buffer (1).Fill_Circle (VectorToPoint(Ball_Pos), radius);
 
-
+      Ball_Pos.x := (Ball_Pos.x + Ball_Direction_X);
+      if (Ball_Pos.x + radius > LCD_Natural_Width) then
+         Ball_Direction_X := - Ball_Direction_X;
+         Ball_Pos.x := LCD_Natural_Width - (Ball_Pos.x + radius - LCD_Natural_Width) - radius;
+      end if;
+      if (Ball_Pos.x < radius) then
+         Ball_Direction_X := - Ball_Direction_X;
+         Ball_Pos.x := radius + (radius - Ball_Pos.X);
+      end if;
+      
+      Ball_Pos.y := (Ball_Pos.y + Ball_Direction_Y);
+      if (Ball_Pos.y + radius > LCD_Natural_Height) then
+         Ball_Direction_Y := - Ball_Direction_Y;
+         Ball_Pos.y := LCD_Natural_Height - (Ball_Pos.y + radius - LCD_Natural_Height) - radius;
+      end if;
+      if (Ball_Pos.y < radius) then
+         Ball_Direction_y := - Ball_Direction_y;
+         Ball_Pos.y := radius + (radius - Ball_Pos.y);
+      end if;
+      
+      
       declare
          State : constant TP_State := Touch_Panel.Get_All_Touch_Points;
       begin

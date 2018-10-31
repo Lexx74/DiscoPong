@@ -1,6 +1,6 @@
 SRC=src/main.adb
 
-all: flash
+all: obj/main
 
 flash: main.bin
 	st-flash --reset write main.bin 0x08000000
