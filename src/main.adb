@@ -41,12 +41,16 @@ with HAL.Touch_Panel;       use HAL.Touch_Panel;
 with STM32.User_Button;     use STM32;
 with BMP_Fonts;
 with LCD_Std_Out;
+with Ada.Numerics.Generic_Elementary_Functions; --use Ada.Numerics.Elementary_Functions;
 
 procedure Main
 is
+   LCD_Natural_Width_f : Float := Float(LCD_Natural_Width);
+   LCD_Natural_Height_f : Float := Float(LCD_Natural_Height);
+package Math is new Ada.Numerics.Generic_Elementary_Functions(Float);
    type My_Vector is record
-   X : Integer;
-   Y : Integer;
+      X : Float;
+      Y : Float;
    end record;
    
    function VectorToPoint(V: My_Vector) return Point is
@@ -55,11 +59,54 @@ is
       return ret;
    end;
    
+   function calculateNormalAngle(pos_x: Integer) return Float is
+      ret : Float;
+      radius : Integer := LCD_Natural_Width / 2;
+      f : Float;
+   begin
+      f := Float(pos_x - radius);
+      f := f / Float(radius);
+      ret := Math.Arcsin(f);
+      return ret / 2.0;
+   end;
+   
+   function angleToDirection(angle: Float) return My_Vector is
+      dir : My_Vector;
+   begin
+      dir.X := Math.sin(angle);
+      dir.Y := Math.cos(angle);
+      return dir;
+   end;
+   
+   procedure multVector(vec: in out My_Vector; factor: Float) is
+   begin
+      vec.X := vec.X * factor;
+      vec.Y := vec.Y * factor;
+   end;
+   
+   function calculateNorm(vec: My_Vector) return Float is
+   begin
+      return Math.sqrt(Float(vec.X * vec.X + vec.Y * vec.Y));
+   end;
+
+   function vectorToAngle(vec: My_Vector) return Float is
+      norm : Float := calculateNorm(vec);
+   begin
+      return Math.Arctan(Float(vec.x / vec.y));
+   end;
+   
    BG : Bitmap_Color := (Alpha => 255, others => 0);
-   Ball_Pos   : My_Vector := (20, 280);
-   Ball_Direction_X: Integer := 7;
-   Ball_Direction_Y: Integer := 3;
-   radius : Integer := 10;
+   Ball_Pos   : My_Vector := (Float(LCD_Natural_Width / 2), Float(15));
+   Ball_Direction: My_Vector := (2.0, -2.0);
+   radius : Float := 10.0;
+   normalAngle : Float;
+   ballAngle : Float;
+   newBallAngle : Float;
+   norm : Float;
+   
+   paddle_Length : Float := 40.0;
+   paddle_x : Float := (LCD_Natural_Width_f - Paddle_Length) / 2.0;
+   paddle_y : Float := 2.0;
 begin
 
    --  Initialize LCD
@@ -92,35 +139,45 @@ begin
 
       Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Blue);
       
-      Display.Hidden_Buffer (1).Fill_Circle (VectorToPoint(Ball_Pos), radius);
+      Display.Hidden_Buffer (1).Fill_Circle (VectorToPoint(Ball_Pos), Integer(radius));
+      Display.Hidden_Buffer (1).Draw_Line(Start => (Integer(paddle_x), Integer(paddle_y)),
+                                          Stop => (Integer(paddle_x + Paddle_Length), Integer(paddle_y)),
+                                          Thickness => 2);
+      -- TODO: Read voltage from pin
+      paddle_x := 50.0;
 
-      Ball_Pos.x := (Ball_Pos.x + Ball_Direction_X);
-      if (Ball_Pos.x + radius > LCD_Natural_Width) then
-         Ball_Direction_X := - Ball_Direction_X;
-         Ball_Pos.x := LCD_Natural_Width - (Ball_Pos.x + radius - LCD_Natural_Width) - radius;
+      Ball_Pos.x := (Ball_Pos.x + Ball_Direction.x);
+      if (Ball_Pos.x + radius > LCD_Natural_Width_f) then
+         Ball_Direction.X := - Ball_Direction.X;
+         Ball_Pos.x := LCD_Natural_Width_f - (Ball_Pos.x + radius - LCD_Natural_Width_f) - radius;
       end if;
       if (Ball_Pos.x < radius) then
-         Ball_Direction_X := - Ball_Direction_X;
+         Ball_Direction.X := - Ball_Direction.X;
          Ball_Pos.x := radius + (radius - Ball_Pos.X);
       end if;
       
-      Ball_Pos.y := (Ball_Pos.y + Ball_Direction_Y);
-      if (Ball_Pos.y + radius > LCD_Natural_Height) then
-         Ball_Direction_Y := - Ball_Direction_Y;
-         Ball_Pos.y := LCD_Natural_Height - (Ball_Pos.y + radius - LCD_Natural_Height) - radius;
+      Ball_Pos.y := (Ball_Pos.y + Ball_Direction.Y);
+      if (Ball_Pos.y + radius > LCD_Natural_Height_f) then
+         Ball_Direction.Y := - Ball_Direction.Y;
+         Ball_Pos.y := LCD_Natural_Height_f - (Ball_Pos.y + radius - LCD_Natural_Height_f) - radius;
       end if;
-      if (Ball_Pos.y < radius) then
-         Ball_Direction_y := - Ball_Direction_y;
-         Ball_Pos.y := radius + (radius - Ball_Pos.y);
+      if (Ball_Pos.y < radius and then Ball_Direction.y < 0.0) then
+         --Ball_Direction.y := - Ball_Direction.y;
+         --Ball_Pos.y := radius + (radius - Ball_Pos.y);
+         norm := calculateNorm(Ball_Direction);
+         normalAngle := calculateNormalAngle(Integer(Ball_Pos.X));
+         ballAngle := vectorToAngle(Ball_Direction);
+         newBallAngle := normalAngle + (normalAngle - ballAngle);
+         Ball_Direction := angleToDirection(newBallAngle);
+         multVector(Ball_Direction, norm);
       end if;
-      
       
       declare
          State : constant TP_State := Touch_Panel.Get_All_Touch_Points;
       begin
          case State'Length is
             when 1 =>
-               Ball_Pos := (State (State'First).X, State (State'First).Y);
+               Ball_Pos := (Float(State (State'First).X), Float(State (State'First).Y));
             when others => null;
          end case;
       end;
