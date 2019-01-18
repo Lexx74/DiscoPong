@@ -41,60 +41,14 @@ with HAL.Touch_Panel;       use HAL.Touch_Panel;
 with STM32.User_Button;     use STM32;
 with BMP_Fonts;
 with LCD_Std_Out;
-with Ada.Numerics.Generic_Elementary_Functions; --use Ada.Numerics.Elementary_Functions;
+with Calculus;                  use Calculus;
 
 procedure Main
 is
    LCD_Natural_Width_f : Float := Float(LCD_Natural_Width);
    LCD_Natural_Height_f : Float := Float(LCD_Natural_Height);
 package Math is new Ada.Numerics.Generic_Elementary_Functions(Float);
-   type My_Vector is record
-      X : Float;
-      Y : Float;
-   end record;
-   
-   function VectorToPoint(V: My_Vector) return Point is
-      ret : Point := (Natural(V.X), Natural(V.Y));
-   begin
-      return ret;
-   end;
-   
-   function calculateNormalAngle(pos_x: Integer) return Float is
-      ret : Float;
-      radius : Integer := LCD_Natural_Width / 2;
-      f : Float;
-   begin
-      f := Float(pos_x - radius);
-      f := f / Float(radius);
-      ret := Math.Arcsin(f);
-      return ret / 2.0;
-   end;
-   
-   function angleToDirection(angle: Float) return My_Vector is
-      dir : My_Vector;
-   begin
-      dir.X := Math.sin(angle);
-      dir.Y := Math.cos(angle);
-      return dir;
-   end;
-   
-   procedure multVector(vec: in out My_Vector; factor: Float) is
-   begin
-      vec.X := vec.X * factor;
-      vec.Y := vec.Y * factor;
-   end;
-   
-   function calculateNorm(vec: My_Vector) return Float is
-   begin
-      return Math.sqrt(Float(vec.X * vec.X + vec.Y * vec.Y));
-   end;
 
-   function vectorToAngle(vec: My_Vector) return Float is
-      norm : Float := calculateNorm(vec);
-   begin
-      return Math.Arctan(Float(vec.x / vec.y));
-   end;
-   
    BG : Bitmap_Color := (Alpha => 255, others => 0);
    Ball_Pos   : My_Vector := (Float(LCD_Natural_Width / 2), Float(15));
    Ball_Direction: My_Vector := (2.0, -2.0);
@@ -103,7 +57,7 @@ package Math is new Ada.Numerics.Generic_Elementary_Functions(Float);
    ballAngle : Float;
    newBallAngle : Float;
    norm : Float;
-   
+
    paddle_Length : Float := 40.0;
    paddle_x : Float := (LCD_Natural_Width_f - Paddle_Length) / 2.0;
    paddle_y : Float := 2.0;
