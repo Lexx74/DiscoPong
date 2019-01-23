@@ -42,14 +42,15 @@ with STM32.User_Button;     use STM32;
 with BMP_Fonts;
 with LCD_Std_Out;
 with Calculus;                  use Calculus;
-with Paddle;
+with Paddle; use Paddle;
+with Game_Display; use Game_Display;
 
 procedure Main
 is
    LCD_Natural_Width_f : Float := Float(LCD_Natural_Width);
    LCD_Natural_Height_f : Float := Float(LCD_Natural_Height);
 
-   BG : Bitmap_Color := (Alpha => 255, others => 0);
+   BG_Color : Bitmap_Color := (Alpha => 255, others => 0);
    Ball_Pos   : My_Vector := (Float(LCD_Natural_Width / 2), Float(15));
    Ball_Direction: My_Vector := (2.0, -2.0);
    radius : Float := 10.0;
@@ -58,9 +59,7 @@ is
    newBallAngle : Float;
    norm : Float;
 
-   paddle_Length : Float := 40.0;
-   paddle_x : Float := (LCD_Natural_Width_f - Paddle_Length) / 2.0;
-   paddle_y : Float := 2.0;
+   Pad : Game_Paddle;
 begin
 
    --  Initialize LCD
@@ -74,31 +73,27 @@ begin
    User_Button.Initialize;
 
    LCD_Std_Out.Set_Font (BMP_Fonts.Font8x8);
-   LCD_Std_Out.Current_Background_Color := BG;
+   LCD_Std_Out.Current_Background_Color := BG_Color;
 
    --  Clear LCD (set background)
-   Display.Hidden_Buffer (1).Set_Source (BG);
-   Display.Hidden_Buffer (1).Fill;
+   Draw_Background (BG_Color);
 
    LCD_Std_Out.Clear_Screen;
    Display.Update_Layer (1, Copy_Back => True);
 
    loop
       if User_Button.Has_Been_Pressed then
-         BG := HAL.Bitmap.Dark_Orange;
+         BG_Color := HAL.Bitmap.Dark_Orange;
       end if;
 
-      Display.Hidden_Buffer (1).Set_Source (BG);
-      Display.Hidden_Buffer (1).Fill;
-
+      Draw_Background (BG_Color);
       Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Blue);
-      
       Display.Hidden_Buffer (1).Fill_Circle (Vector_To_Point(Ball_Pos), Integer(radius));
-      Display.Hidden_Buffer (1).Draw_Line(Start => (Integer(paddle_x), Integer(paddle_y)),
-                                          Stop => (Integer(paddle_x + Paddle_Length), Integer(paddle_y)),
-                                          Thickness => 2);
+
+      Update_Paddle (Pad);
+      Draw_Paddle (Pad);
+
       -- TODO: Read voltage from pin
-      paddle_x := 50.0;
 
       Ball_Pos.x := (Ball_Pos.x + Ball_Direction.x);
       if (Ball_Pos.x + radius > LCD_Natural_Width_f) then
@@ -126,16 +121,6 @@ begin
          Mult_Vector(Ball_Direction, norm);
       end if;
       
-      declare
-         State : constant TP_State := Touch_Panel.Get_All_Touch_Points;
-      begin
-         case State'Length is
-            when 1 =>
-               Ball_Pos := (Float(State (State'First).X), Float(State (State'First).Y));
-            when others => null;
-         end case;
-      end;
-
       --  Update screen
       Display.Update_Layer (1, Copy_Back => True);
 
