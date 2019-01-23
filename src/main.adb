@@ -42,6 +42,7 @@ with STM32.User_Button;     use STM32;
 with BMP_Fonts;
 with LCD_Std_Out;
 with Calculus;                  use Calculus;
+with Paddle;
 
 procedure Main
 is
