@@ -1,4 +1,9 @@
+with STM32.Board;           use STM32.Board;
+with Ada.Numerics.Generic_Elementary_Functions;
+
+
 package body Calculus is
+   package Math is new Ada.Numerics.Generic_Elementary_Functions(Float);
 
    function VectorToPoint(V: My_Vector) return Point is
       ret : Point := (Natural(V.X), Natural(V.Y));

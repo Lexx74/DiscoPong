@@ -1,4 +1,5 @@
 with Ada.Numerics.Generic_Elementary_Functions; --use Ada.Numerics.Elementary_Functions;
+with HAL.Bitmap;            use HAL.Bitmap;
 
 package Calculus is
 
