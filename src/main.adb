@@ -47,7 +47,6 @@ procedure Main
 is
    LCD_Natural_Width_f : Float := Float(LCD_Natural_Width);
    LCD_Natural_Height_f : Float := Float(LCD_Natural_Height);
-package Math is new Ada.Numerics.Generic_Elementary_Functions(Float);
 
    BG : Bitmap_Color := (Alpha => 255, others => 0);
    Ball_Pos   : My_Vector := (Float(LCD_Natural_Width / 2), Float(15));
