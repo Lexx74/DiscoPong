@@ -92,7 +92,7 @@ begin
 
       Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Blue);
       
-      Display.Hidden_Buffer (1).Fill_Circle (VectorToPoint(Ball_Pos), Integer(radius));
+      Display.Hidden_Buffer (1).Fill_Circle (Vector_To_Point(Ball_Pos), Integer(radius));
       Display.Hidden_Buffer (1).Draw_Line(Start => (Integer(paddle_x), Integer(paddle_y)),
                                           Stop => (Integer(paddle_x + Paddle_Length), Integer(paddle_y)),
                                           Thickness => 2);
@@ -117,12 +117,12 @@ begin
       if (Ball_Pos.y < radius and then Ball_Direction.y < 0.0) then
          --Ball_Direction.y := - Ball_Direction.y;
          --Ball_Pos.y := radius + (radius - Ball_Pos.y);
-         norm := calculateNorm(Ball_Direction);
-         normalAngle := calculateNormalAngle(Integer(Ball_Pos.X));
-         ballAngle := vectorToAngle(Ball_Direction);
+         norm := Calculate_Norm(Ball_Direction);
+         normalAngle := Calculate_Normal_Angle(Integer(Ball_Pos.X));
+         ballAngle := Vector_To_Angle(Ball_Direction);
          newBallAngle := normalAngle + (normalAngle - ballAngle);
-         Ball_Direction := angleToDirection(newBallAngle);
-         multVector(Ball_Direction, norm);
+         Ball_Direction := Angle_To_Direction(newBallAngle);
+         Mult_Vector(Ball_Direction, norm);
       end if;
       
       declare
