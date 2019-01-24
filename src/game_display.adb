@@ -6,7 +6,7 @@ package body Game_Display is
       Display.Hidden_Buffer(1).Fill;
    end Draw_Background;
 
-   procedure Draw_Paddle(P : Game_Paddle) is
+   procedure Draw_Paddle(P : Paddle) is
       Start_X : Natural := P.Get_X - Get_Width (P) / 2;
       End_X : Natural := Start_X + Get_Width (P);
       Y : Natural := Paddle_Default_Y;

@@ -42,8 +42,8 @@ with STM32.User_Button;     use STM32;
 with BMP_Fonts;
 with LCD_Std_Out;
 with Calculus; use Calculus;
-with Paddle; use Paddle;
 with Ball_Package; use Ball_Package;
+with Paddle_Package; use Paddle_Package;
 with Game_Display; use Game_Display;
 
 procedure Main
@@ -54,7 +54,7 @@ is
    BG_Color : Bitmap_Color := (Alpha => 255, others => 0);
    
    Ball : Ball_Package.Ball;
-   Pad : Game_Paddle;
+   Pad : Paddle;
 begin
 
    --  Initialize LCD
