@@ -9,6 +9,11 @@ project Prj extends "examples/shared/common/common.gpr" is
    for Main use ("main.adb");
    for Source_Dirs use ("src");
 
+   Package Compiler is
+    for Switches("Ada")
+      use ("-g");
+   end Compiler;
+
    package Linker is
       for Default_Switches ("ada") use
         ("-Wl,--gc-sections", "-Wl,--print-memory-usage");
