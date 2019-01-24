@@ -11,3 +11,8 @@ main.bin: obj/main
 obj/main: prj.gpr $(SRC)
 	gprbuild -Pprj.gpr
 
+.PHONY: clean
+
+clean:
+	gprclean
+	rm main.bin
