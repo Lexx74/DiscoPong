@@ -13,6 +13,7 @@ package Calculus is
    function Angle_To_Direction(angle: Float) return My_Vector;
    procedure Mult_Vector(vec: in out My_Vector; factor: Float);
    function Calculate_Norm(vec: My_Vector) return Float;
-   function Vector_To_Angle(vec: My_Vector) return Float;
+   function Vector_To_Angle(vec: My_Vector) return Float
+      with Pre => vec.y /= 0.0;
 
 end Calculus;

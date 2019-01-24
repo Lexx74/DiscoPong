@@ -41,8 +41,9 @@ with HAL.Touch_Panel;       use HAL.Touch_Panel;
 with STM32.User_Button;     use STM32;
 with BMP_Fonts;
 with LCD_Std_Out;
-with Calculus;                  use Calculus;
+with Calculus; use Calculus;
 with Paddle; use Paddle;
+with Ball_Package; use Ball_Package;
 with Game_Display; use Game_Display;
 
 procedure Main
@@ -51,14 +52,8 @@ is
    LCD_Natural_Height_f : Float := Float(LCD_Natural_Height);
 
    BG_Color : Bitmap_Color := (Alpha => 255, others => 0);
-   Ball_Pos   : My_Vector := (Float(LCD_Natural_Width / 2), Float(15));
-   Ball_Direction: My_Vector := (2.0, -2.0);
-   radius : Float := 10.0;
-   normalAngle : Float;
-   ballAngle : Float;
-   newBallAngle : Float;
-   norm : Float;
-
+   
+   Ball : Ball_Package.Ball;
    Pad : Game_Paddle;
 begin
 
@@ -88,39 +83,13 @@ begin
 
       Draw_Background (BG_Color);
       Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Blue);
-      Display.Hidden_Buffer (1).Fill_Circle (Vector_To_Point(Ball_Pos), Integer(radius));
 
       Update_Paddle (Pad);
       Draw_Paddle (Pad);
 
-      -- TODO: Read voltage from pin
+      Ball.Update;
+      Ball.Draw;
 
-      -- Ball_Pos.x := (Ball_Pos.x + Ball_Direction.x);
-      -- if (Ball_Pos.x + radius > LCD_Natural_Width_f) then
-      --    Ball_Direction.X := - Ball_Direction.X;
-      --    Ball_Pos.x := LCD_Natural_Width_f - (Ball_Pos.x + radius - LCD_Natural_Width_f) - radius;
-      -- end if;
-      -- if (Ball_Pos.x < radius) then
-      --    Ball_Direction.X := - Ball_Direction.X;
-      --    Ball_Pos.x := radius + (radius - Ball_Pos.X);
-      -- end if;
-      -- 
-      -- Ball_Pos.y := (Ball_Pos.y + Ball_Direction.Y);
-      -- if (Ball_Pos.y + radius > LCD_Natural_Height_f) then
-      --    Ball_Direction.Y := - Ball_Direction.Y;
-      --    Ball_Pos.y := LCD_Natural_Height_f - (Ball_Pos.y + radius - LCD_Natural_Height_f) - radius;
-      -- end if;
-      -- if (Ball_Pos.y < radius and then Ball_Direction.y < 0.0) then
-      --    --Ball_Direction.y := - Ball_Direction.y;
-      --    --Ball_Pos.y := radius + (radius - Ball_Pos.y);
-      --    norm := Calculate_Norm(Ball_Direction);
-      --    normalAngle := Calculate_Normal_Angle(Integer(Ball_Pos.X));
-      --    ballAngle := Vector_To_Angle(Ball_Direction);
-      --    newBallAngle := normalAngle + (normalAngle - ballAngle);
-      --    Ball_Direction := Angle_To_Direction(newBallAngle);
-      --    Mult_Vector(Ball_Direction, norm);
-      -- end if;
-      
       --  Update screen
       Display.Update_Layer (1, Copy_Back => True);
 

@@ -16,7 +16,7 @@ package body Calculus is
       radius : Integer := LCD_Natural_Width / 2;
       f : Float;
    begin
-      f := Float(pos_x - radius);
+      f := Float(pos_x - Integer(Float(LCD_Natural_Width) / 2.0));
       f := f / Float(radius);
       ret := Math.Arcsin(f);
       return ret / 2.0;
