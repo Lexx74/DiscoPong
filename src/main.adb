@@ -95,31 +95,31 @@ begin
 
       -- TODO: Read voltage from pin
 
-      Ball_Pos.x := (Ball_Pos.x + Ball_Direction.x);
-      if (Ball_Pos.x + radius > LCD_Natural_Width_f) then
-         Ball_Direction.X := - Ball_Direction.X;
-         Ball_Pos.x := LCD_Natural_Width_f - (Ball_Pos.x + radius - LCD_Natural_Width_f) - radius;
-      end if;
-      if (Ball_Pos.x < radius) then
-         Ball_Direction.X := - Ball_Direction.X;
-         Ball_Pos.x := radius + (radius - Ball_Pos.X);
-      end if;
-      
-      Ball_Pos.y := (Ball_Pos.y + Ball_Direction.Y);
-      if (Ball_Pos.y + radius > LCD_Natural_Height_f) then
-         Ball_Direction.Y := - Ball_Direction.Y;
-         Ball_Pos.y := LCD_Natural_Height_f - (Ball_Pos.y + radius - LCD_Natural_Height_f) - radius;
-      end if;
-      if (Ball_Pos.y < radius and then Ball_Direction.y < 0.0) then
-         --Ball_Direction.y := - Ball_Direction.y;
-         --Ball_Pos.y := radius + (radius - Ball_Pos.y);
-         norm := Calculate_Norm(Ball_Direction);
-         normalAngle := Calculate_Normal_Angle(Integer(Ball_Pos.X));
-         ballAngle := Vector_To_Angle(Ball_Direction);
-         newBallAngle := normalAngle + (normalAngle - ballAngle);
-         Ball_Direction := Angle_To_Direction(newBallAngle);
-         Mult_Vector(Ball_Direction, norm);
-      end if;
+      -- Ball_Pos.x := (Ball_Pos.x + Ball_Direction.x);
+      -- if (Ball_Pos.x + radius > LCD_Natural_Width_f) then
+      --    Ball_Direction.X := - Ball_Direction.X;
+      --    Ball_Pos.x := LCD_Natural_Width_f - (Ball_Pos.x + radius - LCD_Natural_Width_f) - radius;
+      -- end if;
+      -- if (Ball_Pos.x < radius) then
+      --    Ball_Direction.X := - Ball_Direction.X;
+      --    Ball_Pos.x := radius + (radius - Ball_Pos.X);
+      -- end if;
+      -- 
+      -- Ball_Pos.y := (Ball_Pos.y + Ball_Direction.Y);
+      -- if (Ball_Pos.y + radius > LCD_Natural_Height_f) then
+      --    Ball_Direction.Y := - Ball_Direction.Y;
+      --    Ball_Pos.y := LCD_Natural_Height_f - (Ball_Pos.y + radius - LCD_Natural_Height_f) - radius;
+      -- end if;
+      -- if (Ball_Pos.y < radius and then Ball_Direction.y < 0.0) then
+      --    --Ball_Direction.y := - Ball_Direction.y;
+      --    --Ball_Pos.y := radius + (radius - Ball_Pos.y);
+      --    norm := Calculate_Norm(Ball_Direction);
+      --    normalAngle := Calculate_Normal_Angle(Integer(Ball_Pos.X));
+      --    ballAngle := Vector_To_Angle(Ball_Direction);
+      --    newBallAngle := normalAngle + (normalAngle - ballAngle);
+      --    Ball_Direction := Angle_To_Direction(newBallAngle);
+      --    Mult_Vector(Ball_Direction, norm);
+      -- end if;
       
       --  Update screen
       Display.Update_Layer (1, Copy_Back => True);
