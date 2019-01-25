@@ -29,13 +29,13 @@ package body Calculus is
       dir.Y := Math.cos(angle);
       return dir;
    end;
-   
+
    procedure Mult_Vector(vec: in out My_Vector; factor: Float) is
    begin
       vec.X := vec.X * factor;
       vec.Y := vec.Y * factor;
    end;
-   
+
    function Calculate_Norm(vec: My_Vector) return Float is
    begin
       return Math.sqrt(Float(vec.X * vec.X + vec.Y * vec.Y));

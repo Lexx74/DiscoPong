@@ -1,12 +1,12 @@
 package body Paddle_Package is
    function Get_Min_X (This : Paddle) return Natural is
    begin
-      return This.Width / 2 + 1;
+      return This.Width / 2 + Paddle_Default_Thickness / 2 + 1;
    end Get_Min_X;
 
    function Get_Max_X (This : Paddle) return Natural is
    begin
-      return (LCD_Natural_Width - 1) - This.Width / 2;
+      return (LCD_Natural_Width - Paddle_Default_Thickness / 2 - 1) - This.Width / 2;
    end Get_Max_X;
 
    function Get_X (This : Paddle) return Natural is
@@ -24,6 +24,11 @@ package body Paddle_Package is
       return This.Width;
    end Get_Width;
 
+   function Get_Thickness (This : Paddle) return Natural is
+   begin
+      return This.Thickness;
+   end Get_Thickness;
+
    procedure Set_X (This : in out Paddle; X : Natural) is
       Min_X : Natural := This.Get_Min_X;
       Max_X : Natural := This.Get_Max_X;
@@ -40,7 +45,7 @@ package body Paddle_Package is
    procedure Update_Paddle (This : in out Paddle) is
       Touches : constant TP_State := Touch_Panel.Get_All_Touch_Points;
    begin
-      if Touches'Length > 0 then
+      if Touches'Length = 1 then
          This.Set_X(Natural (Touches (Touches'First).X));
       end if;
    end Update_Paddle;

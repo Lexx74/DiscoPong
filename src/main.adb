@@ -52,7 +52,7 @@ is
    LCD_Natural_Height_f : Float := Float(LCD_Natural_Height);
 
    BG_Color : Bitmap_Color := (Alpha => 255, others => 0);
-   
+
    Ball : Ball_Package.Ball;
    Pad : Paddle;
 begin

@@ -6,6 +6,7 @@ package Paddle_Package is
 
    Paddle_Default_Y : constant Natural := 10;
    Paddle_Default_Width : constant Natural := 50;
+   Paddle_Default_Thickness : constant Natural := 6;
 
    function Get_Min_X (This : Paddle) return Natural;
    function Get_Max_X (This : Paddle) return Natural;
@@ -13,10 +14,10 @@ package Paddle_Package is
    function Get_X (This : Paddle) return Natural;
    function Get_Y (This : Paddle) return Natural;
    function Get_Width (This : Paddle) return Natural;
+   function Get_Thickness (This : Paddle) return Natural;
 
    procedure Set_X (This : in out Paddle; X : Natural)
-      with Pre => X < Natural(LCD_Natural_Width),
-           Post => X >= Get_Min_X (This) and X <= Get_Max_X (This);
+      with Post => (This.Get_X >= This.Get_Min_X and This.Get_X <= This.Get_Max_X);
 
    procedure Update_Paddle (This : in out Paddle);
 
@@ -25,5 +26,6 @@ private
       X : Natural := Natural(LCD_Natural_Width / 2);
       Y : Natural := Paddle_Default_Y;
       Width : Natural := Paddle_Default_Width;
+      Thickness : Natural := Paddle_Default_Thickness;
    end record;
 end Paddle_Package;

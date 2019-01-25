@@ -18,6 +18,10 @@ private
       Radius : Float := 10.0;
    end record;
 
-   function Bounce(This : in out Ball; Old_Ball : in out Ball) return Boolean;
+   function Bounce(This : in out Ball; Old_Ball : in out Ball) return Boolean
+      with Post => (This.Pos.x > This.Radius
+                    and then This.Pos.x + This.Radius < LCD_Natural_Width_f
+                    and then This.Pos.y > This.radius
+                    and then This.Pos.y + This.Radius < LCD_Natural_Height_f);
 
 end Ball_Package;

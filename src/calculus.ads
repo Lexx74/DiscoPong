@@ -7,7 +7,7 @@ package Calculus is
       X : Float;
       Y : Float;
    end record;
-   
+
    function Vector_To_Point(V: My_Vector) return Point;
    function Calculate_Normal_Angle(pos_x: Integer) return Float;
    function Angle_To_Direction(angle: Float) return My_Vector;
