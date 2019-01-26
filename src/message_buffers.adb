@@ -115,6 +115,16 @@ package body Message_Buffers is
       return This.Terminator;
    end Terminator;
 
+   function Is_Reception_Complete (This : Message) return Boolean is
+   begin
+      return Current_State (This.Reception_Complete);
+   end Is_Reception_Complete;
+
+   function Is_Transmission_Complete (This : Message) return Boolean is
+   begin
+      return Current_State (This.Transmission_Complete);
+   end Is_Transmission_Complete;
+
    ---------------------------------
    -- Await_Transmission_Complete --
    ---------------------------------

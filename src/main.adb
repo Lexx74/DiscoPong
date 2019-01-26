@@ -55,6 +55,7 @@ is
 
    Ball : Ball_Package.Ball;
    Pad : Paddle;
+   Player_No : Integer;
 begin
 
    --  Initialize LCD
@@ -72,7 +73,7 @@ begin
 
    -- Initialize Coms
    Initialize_Communication;
-   Send_Debug ("Test message for initialization");
+   Player_No := Determine_Player_Number;
 
    --  Clear LCD (set background)
    Draw_Background (BG_Color);

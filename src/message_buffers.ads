@@ -75,6 +75,10 @@ package Message_Buffers is
    --  prior call to Set_Terminator, or the character Nul if no terminator has
    --  ever been set. The terminator character, if received, is not stored in
    --  the message into which characters are being received.
+   
+   function Is_Reception_Complete (This : Message) return Boolean with Inline;
+
+   function Is_Transmission_Complete (This : Message) return Boolean with Inline;
 
    procedure Await_Transmission_Complete (This : in out Message) with Inline;
    --  Used for non-blocking output, to wait until the last char has been sent.

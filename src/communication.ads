@@ -18,6 +18,9 @@ package Communication is
    function Determine_Player_Number return Integer
       with Pre => Initialized (COM);
 
+   Same_Board_Id : exception;
+   Connection_Timeout : exception;
+
 private
    type Status_Message is tagged record
       Ball_Data : Ball;
