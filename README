@@ -1,0 +1,16 @@
+# How to compile
+
+To compile this project, you will need :
+- The Ada_Drivers_Library at https://github.com/AdaCore/Ada_Drivers_Library
+- The GNAT tool suite for arm-eabi.
+
+
+On Linux, set the following environment variables.
+
+export PATH=$PATH:/path/to/GNAT/2018-arm-elf/bin
+export GPR_PROJECT_PATH=/path/to/Ada_Drivers_Library
+
+Then you can just run
+
+make
+make flash
