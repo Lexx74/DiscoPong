@@ -2,7 +2,7 @@
 
 To compile this project, you will need :
 - The Ada_Drivers_Library at https://github.com/AdaCore/Ada_Drivers_Library
-- The GNAT tool suite for arm-eabi.
+- The GNAT tool suite for arm-eabi-elf at https://www.adacore.com/download
 
 
 On Linux, set the following environment variables.
@@ -14,3 +14,10 @@ Then you can just run
 
 make
 make flash
+
+
+# UART
+
+On the STM32F429 discovery board, the UART pins used are
+- UART_TX: PA9
+- UART_RX: PA10

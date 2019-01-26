@@ -72,6 +72,7 @@ begin
 
    -- Initialize Coms
    Initialize_Communication;
+   Send_Debug ("Test message for initialization");
 
    --  Clear LCD (set background)
    Draw_Background (BG_Color);
