@@ -32,7 +32,8 @@ package body Communication is
    begin
       Set_Terminator (In_Buf, To => Character'Val(0));
       Get (COM, In_Buf'Unchecked_Access);
-      while not In_Buf.Is_Reception_Complete and then Limit_Count < Limit loop
+      Send_Message (Id);
+      while not In_Buf.Is_Reception_Complete loop --and then Limit_Count < Limit loop
          Send_Message (Id);
          Limit_Count := Limit_Count + 1;
          delay 1.0;
@@ -50,24 +51,35 @@ package body Communication is
 
       -- Compare Ids and determine players
       for I in 1 .. 12 loop
-         if Id (I) < Foreign_Id (I) then
-            Player_No := 1;
-         else
-            Player_No := 2;
+         if Id (I) /= Foreign_Id (I) then
+            if Id(I) < Foreign_Id (I) then
+               Player_No := 1;
+            else
+               Player_No := 2;
+            end if;
+            exit;
          end if;
       end loop;
 
       -- Now wait for the other board's ACK
-      while not Ack loop
-         if not COM.Receiving then
-            Get (COM, In_Buf'Unchecked_Access);
-         end if;
-         Send_Message (Id);
-         if In_Buf.Is_Reception_Complete then
-            Ack := In_Buf.Content_At (1) = 'A' and then In_Buf.Content_At (2) = 'C'
-               and then In_Buf.Content_At (3) = 'K';
-         end if;
-      end loop;
+      if Player_No = 1 then
+         null;
+        -- while not Ack loop
+        --    if not COM.Receiving then
+        --       Get (COM, In_Buf'Unchecked_Access);
+        --    end if;
+        --    Send_Message (Id);
+        --    if In_Buf.Is_Reception_Complete then
+        --       Ack := In_Buf.Content_At (1) = 'A' and then In_Buf.Content_At (2) = 'C'
+        --          and then In_Buf.Content_At (3) = 'K';
+        --    end if;
+        -- end loop;
+      else -- Player_No = 2
+         for i in 1..5 loop
+            Send_Message(Id);
+            delay 0.1;
+         end loop;
+      end if;
       return Player_No;
    end Determine_Player_Number;
 end Communication;

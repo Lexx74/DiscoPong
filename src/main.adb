@@ -73,7 +73,7 @@ begin
 
    -- Initialize Coms
    Initialize_Communication;
-   --Player_No := Determine_Player_Number;
+   Player_No := Determine_Player_Number;
 
    --  Clear LCD (set background)
    Draw_Background (BG_Color);
@@ -87,7 +87,11 @@ begin
       end if;
 
       Draw_Background (BG_Color);
-      Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Blue);
+      if Player_No = 1 then
+         Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Blue);
+      else
+         Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Red);
+      end if;
 
       Pad.Update;
       Pad.Draw;
