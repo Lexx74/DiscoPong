@@ -42,11 +42,23 @@ package body Paddle_Package is
       end if;
    end Set_X;
 
-   procedure Update_Paddle (This : in out Paddle) is
+   procedure Update (This : in out Paddle) is
       Touches : constant TP_State := Touch_Panel.Get_All_Touch_Points;
    begin
       if Touches'Length = 1 then
          This.Set_X(Natural (Touches (Touches'First).X));
       end if;
-   end Update_Paddle;
+   end Update;
+
+   procedure Draw(This : Paddle) is
+      Start_X : Natural := This.Get_X - This.Get_Width / 2;
+      End_X : Natural := Start_X + This.Get_Width;
+      Y : Natural := Paddle_Default_Y;
+      Thickness : Natural := This.Get_Thickness;
+   begin
+      Display.Hidden_Buffer(1).Draw_Line(Start => (Start_X, Y),
+                                         Stop  => (End_X, Y),
+                                         Thickness => Thickness);
+   end Draw;
+
 end Paddle_Package;

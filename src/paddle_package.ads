@@ -19,7 +19,8 @@ package Paddle_Package is
    procedure Set_X (This : in out Paddle; X : Natural)
       with Post => (This.Get_X >= This.Get_Min_X and This.Get_X <= This.Get_Max_X);
 
-   procedure Update_Paddle (This : in out Paddle);
+   procedure Update (This : in out Paddle);
+   procedure Draw (This : Paddle);
 
 private
    type Paddle is tagged record

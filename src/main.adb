@@ -45,12 +45,12 @@ with Calculus; use Calculus;
 with Ball_Package; use Ball_Package;
 with Paddle_Package; use Paddle_Package;
 with Game_Display; use Game_Display;
+with Communication; use Communication;
 
 procedure Main
 is
    LCD_Natural_Width_f : Float := Float(LCD_Natural_Width);
    LCD_Natural_Height_f : Float := Float(LCD_Natural_Height);
-
    BG_Color : Bitmap_Color := (Alpha => 255, others => 0);
 
    Ball : Ball_Package.Ball;
@@ -70,6 +70,9 @@ begin
    LCD_Std_Out.Set_Font (BMP_Fonts.Font8x8);
    LCD_Std_Out.Current_Background_Color := BG_Color;
 
+   -- Initialize Coms
+   Initialize_Communication;
+
    --  Clear LCD (set background)
    Draw_Background (BG_Color);
 
@@ -84,8 +87,8 @@ begin
       Draw_Background (BG_Color);
       Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Blue);
 
-      Update_Paddle (Pad);
-      Draw_Paddle (Pad);
+      Pad.Update;
+      Pad.Draw;
 
       Ball.Update;
       Ball.Draw;
