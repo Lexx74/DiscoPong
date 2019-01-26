@@ -73,7 +73,7 @@ begin
 
    -- Initialize Coms
    Initialize_Communication;
-   Player_No := Determine_Player_Number;
+   --Player_No := Determine_Player_Number;
 
    --  Clear LCD (set background)
    Draw_Background (BG_Color);

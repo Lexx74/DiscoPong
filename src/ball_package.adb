@@ -1,3 +1,5 @@
+with Ada.Numerics.Generic_Elementary_Functions;
+
 package body Ball_Package is
    procedure Draw(This : Ball) is
    begin
@@ -16,21 +18,22 @@ package body Ball_Package is
    end Update;
 
    function Bounce(This : in out Ball; Old_Ball : in out Ball) return Boolean is
-     normalAngle : Float;
-     ballAngle : Float;
-     newBallAngle : Float;
-     norm : Float;
+      Max_Angle : constant Float := 80.0 * Ada.Numerics.Pi / 180.0; -- radian
+      Normal_Angle : Float;
+      Ball_Angle : Float;
+      New_Ball_Angle : Float;
+      Norm : Float;
    begin
       if (This.Pos.x + This.Radius > LCD_Natural_Width_f) then
          This.Direction.X := - This.Direction.X;
-         This.Pos.x := LCD_Natural_Width_f - (This.Pos.x + This.Radius - LCD_Natural_Width_f) - This.Radius;
-         Old_Ball.Pos.x := LCD_Natural_Width_f * 2.0 - Old_Ball.Pos.x; -- mirror x of old pos;
+         This.Pos.x := 2.0 * (LCD_Natural_Width_f - This.Radius) - This.Pos.x;
+         Old_Ball.Pos.x := 2.0 * (LCD_Natural_Width_f - This.Radius) - Old_Ball.Pos.x; -- mirror x of old pos;
          return True;
       end if;
       if (This.Pos.x < This.Radius) then
          This.Direction.X := - This.Direction.X;
          This.Pos.x := This.Radius + (This.Radius - This.Pos.X);
-         Old_Ball.Pos.y := -Old_Ball.Pos.y;
+         Old_Ball.Pos.x := 2.0 * This.Radius - Old_Ball.Pos.x;
          return True;
       end if;
       if (This.Pos.y + This.Radius > LCD_Natural_Height_f) then
@@ -40,22 +43,29 @@ package body Ball_Package is
       end if;
       if (This.Pos.y < This.Radius and then This.Direction.y < 0.0) then
          declare
-           ratio_before_impact : Float;
-           ratio_after_impact : Float;
-           Impact_X : Float;
+            Ratio_Before_Impact : Float;
+            Ratio_After_Impact : Float;
+            Impact_X : Float;
          begin
-           ratio_before_impact := -(Old_Ball.Pos.y - This.Radius) / This.Direction.y;
-           ratio_after_impact := 1.0 - ratio_before_impact;
-           Impact_X := Old_Ball.Pos.x + ratio_before_impact * This.Direction.x;
+            Ratio_Before_Impact := -(Old_Ball.Pos.y - This.Radius) / This.Direction.y;
+            Ratio_After_Impact := 1.0 - Ratio_Before_Impact;
+            Impact_X := Old_Ball.Pos.x + Ratio_Before_Impact * This.Direction.x;
 
-           norm := calculus.Calculate_Norm(This.Direction);
-           normalAngle := calculus.Calculate_Normal_Angle(Integer(Impact_X));
-           ballAngle := calculus.Vector_To_Angle(This.Direction);
-           newBallAngle := normalAngle + (normalAngle - ballAngle);
-           --newBallAngle := -- TODO: constraint to ]-180°; 180°[
-           This.Direction := calculus.Angle_To_Direction(newBallAngle);
-           calculus.Mult_Vector(This.Direction, norm);
-           This.Pos := (Impact_X + This.Direction.x * ratio_after_impact, This.Radius + This.Direction.y * ratio_after_impact);
+            Norm := calculus.Calculate_Norm(This.Direction);
+            Normal_Angle := calculus.Calculate_Normal_Angle(Integer(Impact_X));
+            Ball_Angle := calculus.Vector_To_Angle(This.Direction);
+            New_Ball_Angle := Normal_Angle + (Normal_Angle - Ball_Angle);
+
+            -- If the ball rebound at a near-flat angle, it can rebounce but still going down
+            if New_Ball_Angle < -Max_Angle then
+               New_Ball_Angle := -Max_Angle;
+            elsif New_Ball_Angle > Max_Angle then
+               New_Ball_Angle := Max_Angle;
+            end if;
+
+            This.Direction := calculus.Angle_To_Direction(New_Ball_Angle);
+            calculus.Mult_Vector(This.Direction, Norm);
+            This.Pos := (Impact_X + This.Direction.x * Ratio_After_Impact, This.Radius + This.Direction.y * Ratio_After_Impact);
          end;
         return True;
       end if;

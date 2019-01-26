@@ -1,9 +1,13 @@
+*
 !*/
 
 obj/
 
 !.gitignore
 !Makefile
+!AUTHORS
+!README
+
 !*.gpr
 !*.adb
 !*.ads
