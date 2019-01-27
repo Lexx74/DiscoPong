@@ -13,14 +13,21 @@ package Ball_Package is
       Radius : Float := 10.0;
    end record;
 
-   procedure Update(This : in out Ball)
+   procedure Update (This : in out Ball)
       with Post => (This.Pos.x >= This.Radius
                     and then Integer(This.Pos.x + This.Radius) <= LCD_Natural_Width
                     and then This.Pos.y >= This.radius);
-   procedure Draw(This : Ball);
+   procedure Draw (This : Ball);
 
 private
 
-   function Bounce(This : in out Ball; Old_Ball : in out Ball) return Boolean;
+   function Bounce (This : in out Ball; Old_Ball : in out Ball) return Boolean;
+   procedure Bounce_On_Goal_Line (This : in out Ball; Old_Ball : in out Ball)
+      with Pre => (This.Pos.Y < This.Radius and then This.Direction.Y < 0.0);
+   procedure Bounce_On_Edge (This : in out Ball; Old_Ball : in out Ball)
+      with Pre => (This.Pos.X + This.Radius > LCD_Natural_Width_f
+                   or else This.Pos.X < This.Radius);
+   procedure Bounce_On_Transition_Edge (This : in out Ball)
+      with Pre => (This.Pos.Y + This.Radius > LCD_Natural_Height_f);
 
-end Ball_Package;
+end Ball_Package; 
