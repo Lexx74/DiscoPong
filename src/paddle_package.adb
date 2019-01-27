@@ -29,6 +29,21 @@ package body Paddle_Package is
       return This.Thickness;
    end Get_Thickness;
 
+   function Get_High_Edge_X (This : Paddle) return Natural is
+      Ret : Natural := This.X + This.Width / 2;
+   begin
+      if Ret > LCD_Natural_Width then
+         return LCD_Natural_Width;
+      else
+         return Ret;
+      end if;
+   end Get_High_Edge_X;
+
+   function Get_Low_Edge_X (This : Paddle) return Natural is
+   begin
+      return This.X - This.Width / 2;
+   end Get_Low_Edge_X;
+
    procedure Set_X (This : in out Paddle; X : Natural) is
       Min_X : Natural := This.Get_Min_X;
       Max_X : Natural := This.Get_Max_X;

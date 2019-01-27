@@ -11,15 +11,11 @@ package body Calculus is
       return ret;
    end;
 
-   function Calculate_Normal_Angle(pos_x: Integer) return Float is
-      ret : Float;
-      radius : Integer := LCD_Natural_Width / 2;
-      f : Float;
+   function Calculate_Normal_Angle(Delta_X : Integer) return Float is
+      Radius : Integer := LCD_Natural_Width / 2;
+      F : Float := Float (Delta_X) / Float (Radius);
    begin
-      f := Float(pos_x - Integer(Float(LCD_Natural_Width) / 2.0));
-      f := f / Float(radius);
-      ret := Math.Arcsin(f);
-      return ret / 2.0;
+      return Math.Arcsin(F) / 2.0;
    end;
 
    function Angle_To_Direction(angle: Float) return My_Vector is

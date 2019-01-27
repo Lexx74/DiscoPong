@@ -1,5 +1,6 @@
 with STM32.Board; use STM32.Board;
 with Calculus; use Calculus;
+with Paddle_Package; use Paddle_Package;
 
 package Ball_Package is
    pragma Assertion_Policy(Check);
@@ -8,12 +9,12 @@ package Ball_Package is
    LCD_Natural_Height_f : constant Float := Float(LCD_Natural_Height);
 
    type Ball is tagged record
-      Pos : My_Vector := (Float(LCD_Natural_Width / 2), Float(150));
-      Direction : My_Vector := (8.0, -2.0);
+      Pos : My_Vector := (Float(LCD_Natural_Width / 2), Float(250));
+      Direction : My_Vector := (0.0, -2.0);
       Radius : Float := 10.0;
    end record;
 
-   procedure Update (This : in out Ball)
+   procedure Update (This : in out Ball; Pad : Paddle)
       with Post => (This.Pos.x >= This.Radius
                     and then Integer(This.Pos.x + This.Radius) <= LCD_Natural_Width
                     and then This.Pos.y >= This.radius);
@@ -21,7 +22,7 @@ package Ball_Package is
 
 private
 
-   function Bounce (This : in out Ball; Old_Ball : in out Ball) return Boolean;
+   function Bounce (This : in out Ball; Old_Ball : in out Ball; Pad : Paddle) return Boolean;
    procedure Bounce_On_Goal_Line (This : in out Ball; Old_Ball : in out Ball)
       with Pre => (This.Pos.Y < This.Radius and then This.Direction.Y < 0.0);
    procedure Bounce_On_Edge (This : in out Ball; Old_Ball : in out Ball)
@@ -29,5 +30,10 @@ private
                    or else This.Pos.X < This.Radius);
    procedure Bounce_On_Transition_Edge (This : in out Ball)
       with Pre => (This.Pos.Y + This.Radius > LCD_Natural_Height_f);
+
+   procedure Bounce_On_Paddle (This : in out Ball; Old_Ball : in out Ball; Pad : Paddle)
+      with Pre => (This.Pos.Y < Float (Pad.Get_Y) + This.Radius
+                   and then This.Pos.X >= Float (Pad.Get_X - Pad.Get_Width / 2)
+                   and then This.Pos.X <= Float (Pad.Get_X + Pad.Get_Width / 2));
 
 end Ball_Package; 

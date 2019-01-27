@@ -9,7 +9,7 @@ package Calculus is
    end record;
 
    function Vector_To_Point(V: My_Vector) return Point;
-   function Calculate_Normal_Angle(pos_x: Integer) return Float;
+   function Calculate_Normal_Angle(Delta_X : Integer) return Float;
    function Angle_To_Direction(angle: Float) return My_Vector;
    procedure Mult_Vector(vec: in out My_Vector; factor: Float);
    function Calculate_Norm(vec: My_Vector) return Float;
