@@ -5,14 +5,20 @@ with Paddle_Package; use Paddle_Package;
 package Ball_Package is
    pragma Assertion_Policy(Check);
 
+   Default_Pos : constant My_Vector := (Float(LCD_Natural_Width / 2), Float(250));
+   Default_Direction : constant My_Vector := (0.0, -2.0);
+
    LCD_Natural_Width_f : constant Float := Float(LCD_Natural_Width);
    LCD_Natural_Height_f : constant Float := Float(LCD_Natural_Height);
 
    type Ball is tagged record
-      Pos : My_Vector := (Float(LCD_Natural_Width / 2), Float(250));
-      Direction : My_Vector := (0.0, -2.0);
+      Pos : My_Vector := Default_Pos;
+      Direction : My_Vector := Default_Direction;
       Radius : Float := 10.0;
    end record;
+
+   procedure Reset_Ball (This : in out Ball)
+      with Post => (This.Pos = Default_Pos and then This.Direction = Default_Direction);
 
    procedure Update (This : in out Ball; Pad : Paddle)
       with Post => (This.Pos.x >= This.Radius
@@ -23,8 +29,9 @@ package Ball_Package is
 private
 
    function Bounce (This : in out Ball; Old_Ball : in out Ball; Pad : Paddle) return Boolean;
-   procedure Bounce_On_Goal_Line (This : in out Ball; Old_Ball : in out Ball)
-      with Pre => (This.Pos.Y < This.Radius and then This.Direction.Y < 0.0);
+   procedure Bounce_On_Goal_Line (This : in out Ball)
+      with Pre => (This.Pos.Y < This.Radius and then This.Direction.Y < 0.0),
+           Post => This.Pos = Default_Pos and then This.Direction = Default_Direction;
    procedure Bounce_On_Edge (This : in out Ball; Old_Ball : in out Ball)
       with Pre => (This.Pos.X + This.Radius > LCD_Natural_Width_f
                    or else This.Pos.X < This.Radius);

@@ -1,6 +1,13 @@
 with Ada.Numerics.Generic_Elementary_Functions;
 
 package body Ball_Package is
+
+   procedure Reset_Ball (This : in out Ball) is
+   begin
+      This.Pos := Default_Pos;
+      This.Direction := Default_Direction;
+   end Reset_Ball;
+
    procedure Draw(This : Ball) is
    begin
       Display.Hidden_Buffer (1).Fill_Circle (Vector_To_Point(This.Pos), Integer(This.Radius));
@@ -28,7 +35,7 @@ package body Ball_Package is
          return True;
       end if;
       if (This.Pos.Y < This.Radius and then This.Direction.y < 0.0) then
-         This.Bounce_On_Goal_Line (Old_Ball);
+         This.Bounce_On_Goal_Line;
         return True;
       end if;
       if (This.Pos.Y < Float (Pad.Get_Y) + This.Radius
@@ -41,37 +48,9 @@ package body Ball_Package is
       return False;
    end Bounce;
 
-   procedure Bounce_On_Goal_Line (This : in out Ball; Old_Ball : in out Ball) is
-      Max_Angle : constant Float := 80.0 * Ada.Numerics.Pi / 180.0; -- radian
-
-      Normal_Angle : Float;
-      Ball_Angle : Float;
-      New_Ball_Angle : Float;
-      Norm : Float;
-
-      Ratio_Before_Impact : Float;
-      Ratio_After_Impact : Float;
-      Impact_X : Float;
+   procedure Bounce_On_Goal_Line (This : in out Ball) is
    begin
-      Ratio_Before_Impact := -(Old_Ball.Pos.y - This.Radius) / This.Direction.Y;
-      Ratio_After_Impact := 1.0 - Ratio_Before_Impact;
-      Impact_X := Old_Ball.Pos.X + Ratio_Before_Impact * This.Direction.X;
-
-      Norm := Calculus.Calculate_Norm(This.Direction);
-      Normal_Angle := Calculus.Calculate_Normal_Angle(Integer(Impact_X));
-      Ball_Angle := Calculus.Vector_To_Angle(This.Direction);
-      New_Ball_Angle := Normal_Angle + (Normal_Angle - Ball_Angle);
-
-      -- If the ball rebound at a near-flat angle, it can rebounce but still going down
-      if New_Ball_Angle < -Max_Angle then
-         New_Ball_Angle := -Max_Angle;
-      elsif New_Ball_Angle > Max_Angle then
-         New_Ball_Angle := Max_Angle;
-      end if;
-
-      This.Direction := Calculus.Angle_To_Direction(New_Ball_Angle);
-      Calculus.Mult_Vector(This.Direction, Norm);
-      This.Pos := (Impact_X + This.Direction.X * Ratio_After_Impact, This.Radius + This.Direction.Y * Ratio_After_Impact);
+      This.Reset_Ball;
    end Bounce_On_Goal_Line;
 
    procedure Bounce_On_Edge (This : in out Ball; Old_Ball : in out Ball) is
