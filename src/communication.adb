@@ -1,3 +1,7 @@
+with Ada.Exceptions;  use Ada.Exceptions;
+with Ada.Strings; use Ada.Strings;
+with Ada.Strings.Fixed; use Ada.Strings.Fixed;
+
 package body Communication is
    procedure Initialize_Communication is
    begin
@@ -19,67 +23,70 @@ package body Communication is
    end Send_Debug;
 
    function Determine_Player_Number return Integer is
-      Id : String (1 .. 12) := Unique_Id;
-      -- End Of Message is the nul character
-      EOM : String (1 .. 1) := (others => Character'Val(0));
-      Foreign_Id : String (1 .. 12);
-      In_Buf : aliased Message (Physical_Size => 1024);
-      Limit : Integer := 100;
-      Limit_Count : Integer := 0;
-      Player_No : Integer := 1;
+      CR : constant Character := Character'Val(13);
+      LF : constant Character := Character'Val(10);
+      Terminator : constant Character := LF;
 
-      Ack : Boolean := False;
+      subtype Identity_String is String (1..30);
+
+      function Device_Id_to_Identity(Tuple : Device_Id_Tuple) return Identity_String is
+         subtype Identity_Number is String (1..10);
+
+         Ids : array (1..3) of Identity_Number;
+      begin
+         for I in Tuple'Range loop
+            Move(Trim(Tuple(I)'Image, Ada.Strings.Left),
+                 Ids(I), Justify => Right, Pad => '0');
+         end loop;
+
+         return Ids(1) & Ids(2) & Ids(3);
+      end Device_Id_to_Identity;
+
+      Own_Id : Identity_String := Device_Id_to_Identity(Unique_Id);
+      Foreign_Id : Identity_String;
+      Recv_Buf : aliased Message (Physical_Size => 1024);
+      Received_Ack : Boolean := False;
+      Received_Id : Boolean := False;
    begin
-      Set_Terminator (In_Buf, To => Character'Val(0));
-      Get (COM, In_Buf'Unchecked_Access);
-      Send_Message (Id);
-      while not In_Buf.Is_Reception_Complete loop --and then Limit_Count < Limit loop
-         Send_Message (Id);
-         Limit_Count := Limit_Count + 1;
-         delay 1.0;
-      end loop;
-
-      -- Raise exception if timeout limit
-      if Limit <= Limit_Count then
-         raise Connection_Timeout;
-      end if;
-
-      -- Copy the received id to variable
-      for I in Foreign_Id'Range loop
-         Foreign_Id (I) := In_Buf.Content_At(I);
-      end loop;
-
-      -- Compare Ids and determine players
-      for I in 1 .. 12 loop
-         if Id (I) /= Foreign_Id (I) then
-            if Id(I) < Foreign_Id (I) then
-               Player_No := 1;
-            else
-               Player_No := 2;
+      Set_Terminator (Recv_Buf, Terminator);
+      Get (COM, Recv_Buf'Unchecked_Access);
+      while not (Received_Ack and Received_Id) loop
+         Send_Message (Own_Id & CR & LF);
+         if Recv_Buf.Is_Reception_Complete then
+            --Send_Debug("Received: " & Recv_Buf.Content & CR & LF);
+            if Recv_Buf.Content'Length >= 3
+              and then Recv_Buf.Content (1..3) = "ACK" then
+               --Send_Message (Own_Id & ": Received ACK" & CR & LF);
+               Received_Ack := True;
+            elsif Recv_Buf.Content'Length > Foreign_Id'Last then
+               Foreign_Id := Recv_Buf.Content(Foreign_Id'Range);
+               delay 0.1;
+               Send_Message ("ACK" & CR & LF);
+               Get (COM, Recv_Buf'Unchecked_Access);
+               Received_Id := True;
             end if;
-            exit;
+         end if;
+         delay 0.7;
+      end loop;
+
+      Send_Debug ("I am " & Own_Id & "and I'm playing with " & Foreign_Id & ", I am player ");
+
+      for I in Own_Id'Range loop
+         if Own_Id(I) /= Foreign_Id(I) then
+            if Own_Id(I) < Foreign_Id(I) then
+               Send_Message("1" & CR & LF);
+               return 1;
+            else
+               Send_Message("2" & CR & LF);
+               return 2;
+            end if;
          end if;
       end loop;
 
-      -- Now wait for the other board's ACK
-      if Player_No = 1 then
-         null;
-        -- while not Ack loop
-        --    if not COM.Receiving then
-        --       Get (COM, In_Buf'Unchecked_Access);
-        --    end if;
-        --    Send_Message (Id);
-        --    if In_Buf.Is_Reception_Complete then
-        --       Ack := In_Buf.Content_At (1) = 'A' and then In_Buf.Content_At (2) = 'C'
-        --          and then In_Buf.Content_At (3) = 'K';
-        --    end if;
-        -- end loop;
-      else -- Player_No = 2
-         for i in 1..5 loop
-            Send_Message(Id);
-            delay 0.1;
-         end loop;
-      end if;
-      return Player_No;
+      return 0;
+   exception
+      when E:others =>
+         Send_Debug(Exception_Message(E) & CR & LF);
+         raise;
    end Determine_Player_Number;
 end Communication;
