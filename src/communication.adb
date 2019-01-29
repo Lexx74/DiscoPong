@@ -12,7 +12,7 @@ package body Communication is
    procedure Send_Message (M : String) is
       Buf : aliased Message (Physical_Size => 1024);
    begin
-      Set (Buf, To => M);
+      Set (Buf, To => M & Terminator);
       Put (COM, Buf'Unchecked_Access);
       Await_Transmission_Complete (Buf);
    end Send_Message;
@@ -25,7 +25,6 @@ package body Communication is
    function Determine_Player_Number return Integer is
       CR : constant Character := Character'Val(13);
       LF : constant Character := Character'Val(10);
-      Terminator : constant Character := LF;
 
       subtype Identity_String is String (1..30);
 
@@ -47,37 +46,33 @@ package body Communication is
       Recv_Buf : aliased Message (Physical_Size => 1024);
       Received_Ack : Boolean := False;
       Received_Id : Boolean := False;
+      I : Integer := 0;
    begin
       Set_Terminator (Recv_Buf, Terminator);
       Get (COM, Recv_Buf'Unchecked_Access);
       while not (Received_Ack and Received_Id) loop
-         Send_Message (Own_Id & CR & LF);
+         if (Received_Id) then
+            Send_Message (Own_Id & "ACK");
+         else
+            Send_Message (Own_Id);
+         end if;
+
          if Recv_Buf.Is_Reception_Complete then
-            --Send_Debug("Received: " & Recv_Buf.Content & CR & LF);
-            if Recv_Buf.Content'Length >= 3
-              and then Recv_Buf.Content (1..3) = "ACK" then
-               --Send_Message (Own_Id & ": Received ACK" & CR & LF);
+            if Recv_Buf.Content'Length = Own_Id'Length + 3 then
                Received_Ack := True;
-            elsif Recv_Buf.Content'Length > Foreign_Id'Last then
+            elsif Recv_Buf.Content'Length = Own_Id'Length then
                Foreign_Id := Recv_Buf.Content(Foreign_Id'Range);
-               delay 0.1;
-               Send_Message ("ACK" & CR & LF);
-               Get (COM, Recv_Buf'Unchecked_Access);
                Received_Id := True;
             end if;
+            Get (COM, Recv_Buf'Unchecked_Access);
          end if;
-         delay 0.7;
+         delay 0.5;
       end loop;
-
-      Send_Debug ("I am " & Own_Id & "and I'm playing with " & Foreign_Id & ", I am player ");
-
       for I in Own_Id'Range loop
          if Own_Id(I) /= Foreign_Id(I) then
             if Own_Id(I) < Foreign_Id(I) then
-               Send_Message("1" & CR & LF);
                return 1;
             else
-               Send_Message("2" & CR & LF);
                return 2;
             end if;
          end if;

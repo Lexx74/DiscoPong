@@ -7,6 +7,8 @@ with Message_Buffers; use Message_Buffers;
 
 package Communication is
 
+   Terminator : constant Character := ';';
+
    type Status_Message is tagged private;
 
    procedure Initialize_Communication
