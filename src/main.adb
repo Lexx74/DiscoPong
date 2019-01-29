@@ -56,6 +56,9 @@ is
    Ball : Ball_Package.Ball;
    Pad : Paddle;
    Player_No : Integer;
+
+   Ball_Status : Status_Message;
+   Has_Ball : Boolean;
 begin
 
    --  Initialize LCD
@@ -81,22 +84,30 @@ begin
    LCD_Std_Out.Clear_Screen;
    Display.Update_Layer (1, Copy_Back => True);
 
+   Has_Ball := Player_No = 1;
+
    loop
       if User_Button.Has_Been_Pressed then
          BG_Color := HAL.Bitmap.Dark_Orange;
       end if;
 
       Draw_Background (BG_Color);
-      if Player_No = 1 then
+      if Has_Ball then
          Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Blue);
+         Ball.Update (Pad);
+         Ball_Status.Ball_Data.Pos.X := Ball.Pos.X;
+         Ball_Status.Ball_Data.Pos.Y := Ball.Pos.Y;
+         Send_Status_Message (Ball_Status);
       else
          Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Red);
+         Ball_Status := Receive_Status_Message;
+         Ball.Pos.X := Ball_Status.Ball_Data.Pos.X;
+         Ball.Pos.Y := Ball_Status.Ball_Data.Pos.Y;
       end if;
 
       Pad.Update;
       Pad.Draw;
 
-      Ball.Update (Pad);
       Ball.Draw;
 
       --  Update screen

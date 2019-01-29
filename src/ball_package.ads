@@ -25,6 +25,11 @@ package Ball_Package is
                     and then Integer(This.Pos.x + This.Radius) <= LCD_Natural_Width
                     and then This.Pos.y >= This.radius);
    procedure Draw (This : Ball);
+   procedure Switch_Screen (This : in out Ball)
+      with Pre => This.Pos.Y > LCD_Natural_Height_f,
+           Post => (This.Pos.Y < LCD_Natural_Height_f and then
+                    This'Old.Direction.X = - This.Direction.X and then
+                    This'Old.Direction.Y = - This.Direction.Y);
 
 private
 

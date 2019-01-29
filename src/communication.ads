@@ -7,9 +7,14 @@ with Message_Buffers; use Message_Buffers;
 
 package Communication is
 
-   Terminator : constant Character := ';';
+   type Status_Message is tagged record
+      Ball_Data : Ball;
+      Score_1 : Natural;
+      Score_2 : Natural;
+   end record;
 
-   type Status_Message is tagged private;
+   Terminator : constant Character := ';';
+   Separator : constant Character := '#';
 
    procedure Initialize_Communication
       with Post => Initialized (COM);
@@ -17,16 +22,14 @@ package Communication is
       with Pre => Initialized (COM);
    procedure Send_Debug (M : String)
       with Pre => Initialized (COM);
+   procedure Send_Status_Message (M : Status_Message)
+      with Pre => Initialized (COM);
+   function Receive_Status_Message return Status_Message
+      with Pre => Initialized (COM);
    function Determine_Player_Number return Integer
       with Pre => Initialized (COM);
 
    Same_Board_Id : exception;
    Connection_Timeout : exception;
 
-private
-   type Status_Message is tagged record
-      Ball_Data : Ball;
-      Score_1 : Natural;
-      Score_2 : Natural;
-   end record;
 end Communication;

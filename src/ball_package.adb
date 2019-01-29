@@ -24,6 +24,14 @@ package body Ball_Package is
       end loop;
    end Update;
 
+   procedure Switch_Screen (This : in out Ball) is
+      Diff : Float := This.Pos.Y - LCD_Natural_Width_f;
+   begin
+      This.Pos.Y := LCD_Natural_Width_f - Diff;
+      This.Direction.X := - This.Direction.X;
+      This.Direction.Y := - This.Direction.Y;
+   end Switch_Screen;
+
    function Bounce(This : in out Ball; Old_Ball : in out Ball; Pad : Paddle) return Boolean is
    begin
       if (This.Pos.X + This.Radius > LCD_Natural_Width_f or else This.Pos.X < This.Radius) then

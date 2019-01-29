@@ -22,6 +22,41 @@ package body Communication is
       Send_Message ("DEBUG: " & M);
    end Send_Debug;
 
+   procedure Send_Status_Message (M : Status_Message) is
+   begin
+      Send_Message (M.Ball_Data.Pos.X'Image & Separator &
+                    M.Ball_Data.Pos.Y'Image);
+   end Send_Status_Message;
+
+   function Receive_Status_Message return Status_Message is
+      Recv_Buf : aliased Message (Physical_Size => 1024);
+      Reached_Term : Boolean := False;
+      First : Integer := 1;
+      Last : Integer := 1;
+      I : Integer := 1;
+      Ret : Status_Message;
+   begin
+      Set_Terminator (Recv_Buf, Terminator);
+      Get (COM, Recv_Buf'Unchecked_Access);
+      Await_Reception_Complete (Recv_Buf);
+      
+      -- This looks very ugly
+      while I <= Recv_Buf.Length and then Recv_Buf.Content(I) /= Separator loop
+         I := I + 1;
+      end loop;
+      Last := I - 1;
+      Ret.Ball_Data.Pos.X := Float'Value(Recv_Buf.Content (First .. Last));
+
+      First := I + 1;
+      while I <= Recv_Buf.Length loop
+         I := I + 1;
+      end loop;
+      Last := I - 1;
+      Ret.Ball_Data.Pos.Y := Float'Value(Recv_Buf.Content (First .. Last));
+
+      return Ret;
+   end Receive_Status_Message;
+
    function Determine_Player_Number return Integer is
       CR : constant Character := Character'Val(13);
       LF : constant Character := Character'Val(10);
