@@ -53,7 +53,8 @@ is
    LCD_Natural_Height_f : Float := Float(LCD_Natural_Height);
    BG_Color : Bitmap_Color := (Alpha => 255, others => 0);
 
-   Ball : Ball_Package.Ball;
+   Ball : Local_Ball;
+   GBall : Global_Ball;
    Pad : Paddle;
    Player_No : Integer;
 
@@ -94,16 +95,18 @@ begin
       Draw_Background (BG_Color);
       if Has_Ball then
          Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Blue);
-         Ball.Update (Pad);
-         Ball_Status.Ball_Data.Pos.X := Ball.Pos.X;
-         Ball_Status.Ball_Data.Pos.Y := Ball.Pos.Y;
+         GBall.Update (Pad);
+         Ball_Status.Ball_Data := GBall;
          Send_Status_Message (Ball_Status);
       else
          Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Red);
          Ball_Status := Receive_Status_Message;
-         Ball.Pos.X := Ball_Status.Ball_Data.Pos.X;
-         Ball.Pos.Y := Ball_Status.Ball_Data.Pos.Y;
+         GBall := Ball_Status.Ball_Data;
       end if;
+
+      Has_Ball := Do_I_Have_Ball(GBall, Player_No);
+
+      Global_To_Local(GBall, Ball, Player_No);
 
       Pad.Update;
       Pad.Draw;

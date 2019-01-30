@@ -10,7 +10,7 @@ package body Ball_Package is
 
    procedure Draw(This : Ball) is
    begin
-      Display.Hidden_Buffer (1).Fill_Circle (Vector_To_Point(This.Pos), Integer(This.Radius));
+      Display.Hidden_Buffer (1).Fill_Circle (Vector_To_Point(This.Pos), Integer(Radius));
    end Draw;
 
    procedure Update(This : in out Ball; Pad : Paddle) is
@@ -24,30 +24,55 @@ package body Ball_Package is
       end loop;
    end Update;
 
-   procedure Switch_Screen (This : in out Ball) is
-      Diff : Float := This.Pos.Y - LCD_Natural_Width_f;
+   procedure Global_To_Local(G : in Global_Ball; L : out Local_Ball; Player : Integer) is
    begin
-      This.Pos.Y := LCD_Natural_Width_f - Diff;
-      This.Direction.X := - This.Direction.X;
-      This.Direction.Y := - This.Direction.Y;
-   end Switch_Screen;
+      if Player = 1 then
+         L := G;
+      else
+         L.Pos.X := LCD_Natural_Width_f - G.Pos.X;
+         L.Pos.Y := LCD_Natural_Height_f * 2.0 - G.Pos.Y;
+         L.Direction.X := -G.Direction.X;
+         L.Direction.Y := -G.Direction.Y;
+      end if;
+   end Global_To_Local;
+
+   procedure Local_To_Global(L : in Local_Ball; G : out Global_Ball; Player : Integer) is
+   begin
+      if Player = 1 then
+         G := L;
+      else
+         G.Pos.X := LCD_Natural_Width_f - L.Pos.X;
+         G.Pos.Y := LCD_Natural_Height_f * 2.0 - L.Pos.Y;
+         G.Direction.X := -G.Direction.X;
+         G.Direction.Y := -G.Direction.Y;
+      end if;
+   end Local_To_Global;
+
+   function Do_I_Have_Ball(G : in Global_Ball; Player : Integer) return Boolean is
+   begin
+      if Player = 1 then
+         return G.Pos.Y <= LCD_Natural_Height_f;
+      else
+         return G.Pos.Y > LCD_Natural_Height_f;
+      end if;
+   end Do_I_Have_Ball;
 
    function Bounce(This : in out Ball; Old_Ball : in out Ball; Pad : Paddle) return Boolean is
    begin
-      if (This.Pos.X + This.Radius > LCD_Natural_Width_f or else This.Pos.X < This.Radius) then
+      if (This.Pos.X + Radius > LCD_Natural_Width_f or else This.Pos.X < Radius) then
          This.Bounce_On_Edge (Old_Ball);
          return True;
       end if;
-      if (This.Pos.Y + This.Radius > LCD_Natural_Height_f) then
+      if (This.Pos.Y + Radius > LCD_Natural_Height_f) then
          This.Bounce_On_Transition_Edge;
          return True;
       end if;
-      if (This.Pos.Y < This.Radius and then This.Direction.y < 0.0) then
+      if (This.Pos.Y < Radius and then This.Direction.y < 0.0) then
          This.Bounce_On_Goal_Line;
         return True;
       end if;
-      if (This.Pos.Y < Float (Pad.Get_Y) + This.Radius
-          and then Old_Ball.Pos.Y >= Float(Pad.Get_Y) + This.Radius
+      if (This.Pos.Y < Float (Pad.Get_Y) + Radius
+          and then Old_Ball.Pos.Y >= Float(Pad.Get_Y) + Radius
           and then This.Pos.X >= Float (Pad.Get_Low_Edge_X)
           and then This.Pos.X <= Float (Pad.Get_High_Edge_X)) then
          This.Bounce_On_Paddle (Old_Ball, Pad);
@@ -63,16 +88,16 @@ package body Ball_Package is
 
    procedure Bounce_On_Edge (This : in out Ball; Old_Ball : in out Ball) is
    begin
-      if (This.Pos.x + This.Radius > LCD_Natural_Width_f) then
+      if (This.Pos.x + Radius > LCD_Natural_Width_f) then
          -- Collision on left side of screen
          This.Direction.X := - This.Direction.X;
-         This.Pos.X := 2.0 * (LCD_Natural_Width_f - This.Radius) - This.Pos.X;
-         Old_Ball.Pos.X := 2.0 * (LCD_Natural_Width_f - This.Radius) - Old_Ball.Pos.X; -- mirror x of old pos;
-      elsif (This.Pos.X < This.Radius) then
+         This.Pos.X := 2.0 * (LCD_Natural_Width_f - Radius) - This.Pos.X;
+         Old_Ball.Pos.X := 2.0 * (LCD_Natural_Width_f - Radius) - Old_Ball.Pos.X; -- mirror x of old pos;
+      elsif (This.Pos.X < Radius) then
          -- Collision on right side of screen
          This.Direction.X := - This.Direction.X;
-         This.Pos.X := This.Radius + (This.Radius - This.Pos.X);
-         Old_Ball.Pos.X := 2.0 * This.Radius - Old_Ball.Pos.X;
+         This.Pos.X := Radius + (Radius - This.Pos.X);
+         Old_Ball.Pos.X := 2.0 * Radius - Old_Ball.Pos.X;
       end if;
    end Bounce_On_Edge;
 
@@ -80,7 +105,7 @@ package body Ball_Package is
    begin
          -- Collision on transition edge of screen
       This.Direction.Y := - This.Direction.Y;
-      This.Pos.Y := LCD_Natural_Height_f - (This.Pos.Y + This.Radius - LCD_Natural_Height_f) - This.Radius;
+      This.Pos.Y := LCD_Natural_Height_f - (This.Pos.Y + Radius - LCD_Natural_Height_f) - Radius;
    end Bounce_On_Transition_Edge;
 
    procedure Bounce_On_Paddle (This : in out Ball; Old_Ball : in out Ball; Pad : Paddle) is
@@ -95,7 +120,7 @@ package body Ball_Package is
       Ratio_After_Impact : Float;
       Impact_X : Float;
    begin
-      Ratio_Before_Impact := -(Old_Ball.Pos.Y - This.Radius - Float (Pad.Get_Y)) / This.Direction.Y;
+      Ratio_Before_Impact := -(Old_Ball.Pos.Y - Radius - Float (Pad.Get_Y)) / This.Direction.Y;
       Ratio_After_Impact := 1.0 - Ratio_Before_Impact;
       Impact_X := Old_Ball.Pos.X + Ratio_Before_Impact * This.Direction.X;
 
@@ -114,7 +139,7 @@ package body Ball_Package is
       This.Direction := Calculus.Angle_To_Direction(New_Ball_Angle);
       Calculus.Mult_Vector(This.Direction, Norm);
       This.Pos := (Impact_X + This.Direction.X * Ratio_After_Impact,
-                   This.Radius + Float (Pad.Get_Y) + This.Direction.Y * Ratio_After_Impact);
+                   Radius + Float (Pad.Get_Y) + This.Direction.Y * Ratio_After_Impact);
    end Bounce_On_Paddle;
 
 end Ball_Package;
