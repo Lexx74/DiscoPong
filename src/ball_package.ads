@@ -11,27 +11,28 @@ package Ball_Package is
    Radius : constant Float := 10.0;
 
    Default_Pos : constant My_Vector := (Float(LCD_Natural_Width / 2), Float(250));
-   Default_Direction : constant My_Vector := (0.0, -2.0);
+   Default_Direction : constant My_Vector := (0.0, -3.0);
+
+   subtype X_Range is Float range Radius .. LCD_Natural_Width_f - Radius;
+
+   subtype Y_Local_Range is Float range Radius .. LCD_Natural_Height_f;
+   subtype Y_Global_Range is Float range Radius .. LCD_Natural_Height_f * 2.0 - Radius;
 
    type Ball is tagged record
       Pos : My_Vector := Default_Pos;
       Direction : My_Vector := Default_Direction;
-   end record
-     with Dynamic_Predicate => (Ball.Pos.X in Radius .. LCD_Natural_Width_f - Radius);
+   end record;
 
-   subtype Local_Ball is Ball
-     with Dynamic_Predicate => (Local_Ball.Pos.Y in Radius .. LCD_Natural_Height_f - Radius);
+   subtype Local_Ball is Ball;
 
-   subtype Global_Ball is Ball
-     with Dynamic_Predicate => (Global_Ball.Pos.Y in Radius .. LCD_Natural_Height_f * 2.0 - Radius);
+   subtype Global_Ball is Ball;
 
    procedure Reset_Ball (This : in out Ball)
       with Post => (This.Pos = Default_Pos and then This.Direction = Default_Direction);
 
-   procedure Update (This : in out Global_Ball; Pad : Paddle)
-      with Post => (This.Pos.x >= Radius
-                    and then Integer(This.Pos.x + Radius) <= LCD_Natural_Width
-                    and then This.Pos.y >= Radius);
+   procedure Update (This : in out Local_Ball; Pad : Paddle)
+     with Pre  => (This.Pos.X in X_Range and This.Pos.Y in Y_Local_Range),
+          Post => (This.Pos.X in X_Range and This.Pos.Y in Y_Global_Range);
 
    procedure Draw (This : Ball);
 
@@ -47,10 +48,9 @@ private
    procedure Bounce_On_Goal_Line (This : in out Ball)
       with Pre => (This.Pos.Y < Radius and then This.Direction.Y < 0.0),
            Post => This.Pos = Default_Pos and then This.Direction = Default_Direction;
+
    procedure Bounce_On_Edge (This : in out Ball; Old_Ball : in out Ball)
-      with Pre => (This.Pos.X + Radius > LCD_Natural_Width_f
-                   or else This.Pos.X < Radius);
-   procedure Bounce_On_Transition_Edge (This : in out Ball);
+      with Pre => (This.Pos.X not in X_Range);
 
    procedure Bounce_On_Paddle (This : in out Ball; Old_Ball : in out Ball; Pad : Paddle)
       with Pre => (This.Pos.Y < Float (Pad.Get_Y) + Radius

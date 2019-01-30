@@ -46,6 +46,7 @@ with Ball_Package; use Ball_Package;
 with Paddle_Package; use Paddle_Package;
 with Game_Display; use Game_Display;
 with Communication; use Communication;
+with Ada.Exceptions;  use Ada.Exceptions;
 
 procedure Main
 is
@@ -95,18 +96,22 @@ begin
       Draw_Background (BG_Color);
       if Has_Ball then
          Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Blue);
-         GBall.Update (Pad);
+
+         Ball.Update(Pad);
+
+         Local_To_Global(Ball, GBall, Player_No);
+
          Ball_Status.Ball_Data := GBall;
          Send_Status_Message (Ball_Status);
       else
          Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Red);
          Ball_Status := Receive_Status_Message;
          GBall := Ball_Status.Ball_Data;
+
+         Global_To_Local(GBall, Ball, Player_No);
       end if;
 
       Has_Ball := Do_I_Have_Ball(GBall, Player_No);
-
-      Global_To_Local(GBall, Ball, Player_No);
 
       Pad.Update;
       Pad.Draw;
@@ -117,4 +122,7 @@ begin
       Display.Update_Layer (1, Copy_Back => True);
 
    end loop;
+exception
+   when E : others =>
+      Send_Debug (Exception_Message (E) & "Has_Ball=" & Has_Ball'Image);
 end Main;

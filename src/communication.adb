@@ -3,6 +3,11 @@ with Ada.Strings; use Ada.Strings;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 
 package body Communication is
+   CR : constant Character := Character'Val(13);
+   LF : constant Character := Character'Val(10);
+
+   CRLF : constant String := CR & LF;
+
    procedure Initialize_Communication is
    begin
       Initialize (COM);
@@ -100,8 +105,6 @@ package body Communication is
    end Receive_Status_Message;
 
    function Determine_Player_Number return Integer is
-      CR : constant Character := Character'Val(13);
-      LF : constant Character := Character'Val(10);
 
       subtype Identity_String is String (1..30);
 

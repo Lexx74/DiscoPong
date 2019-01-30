@@ -13,7 +13,7 @@ package body Ball_Package is
       Display.Hidden_Buffer (1).Fill_Circle (Vector_To_Point(This.Pos), Integer(Radius));
    end Draw;
 
-   procedure Update(This : in out Ball; Pad : Paddle) is
+   procedure Update(This : in out Local_Ball; Pad : Paddle) is
       Old_Ball : Ball := This;
    begin
      This.Pos.x := This.Pos.x + This.Direction.x;
@@ -43,17 +43,17 @@ package body Ball_Package is
       else
          G.Pos.X := LCD_Natural_Width_f - L.Pos.X;
          G.Pos.Y := LCD_Natural_Height_f * 2.0 - L.Pos.Y;
-         G.Direction.X := -G.Direction.X;
-         G.Direction.Y := -G.Direction.Y;
+         G.Direction.X := -L.Direction.X;
+         G.Direction.Y := -L.Direction.Y;
       end if;
    end Local_To_Global;
 
    function Do_I_Have_Ball(G : in Global_Ball; Player : Integer) return Boolean is
    begin
       if Player = 1 then
-         return G.Pos.Y <= LCD_Natural_Height_f;
+         return G.Pos.Y < LCD_Natural_Height_f;
       else
-         return G.Pos.Y > LCD_Natural_Height_f;
+         return G.Pos.Y >= LCD_Natural_Height_f;
       end if;
    end Do_I_Have_Ball;
 
@@ -61,10 +61,6 @@ package body Ball_Package is
    begin
       if (This.Pos.X + Radius > LCD_Natural_Width_f or else This.Pos.X < Radius) then
          This.Bounce_On_Edge (Old_Ball);
-         return True;
-      end if;
-      if (This.Pos.Y + Radius > LCD_Natural_Height_f) then
-         This.Bounce_On_Transition_Edge;
          return True;
       end if;
       if (This.Pos.Y < Radius and then This.Direction.y < 0.0) then
@@ -100,13 +96,6 @@ package body Ball_Package is
          Old_Ball.Pos.X := 2.0 * Radius - Old_Ball.Pos.X;
       end if;
    end Bounce_On_Edge;
-
-   procedure Bounce_On_Transition_Edge (This : in out Ball) is
-   begin
-         -- Collision on transition edge of screen
-      This.Direction.Y := - This.Direction.Y;
-      This.Pos.Y := LCD_Natural_Height_f - (This.Pos.Y + Radius - LCD_Natural_Height_f) - Radius;
-   end Bounce_On_Transition_Edge;
 
    procedure Bounce_On_Paddle (This : in out Ball; Old_Ball : in out Ball; Pad : Paddle) is
       Max_Angle : constant Float := 80.0 * Ada.Numerics.Pi / 180.0; -- radian
