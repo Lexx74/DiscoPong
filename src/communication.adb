@@ -25,7 +25,11 @@ package body Communication is
    procedure Send_Status_Message (M : Status_Message) is
    begin
       Send_Message (M.Ball_Data.Pos.X'Image & Separator &
-                    M.Ball_Data.Pos.Y'Image);
+                    M.Ball_Data.Pos.Y'Image & Separator &
+                    M.Ball_Data.Direction.X'Image & Separator &
+                    M.Ball_Data.Direction.Y'Image & Separator &
+                    M.Score_1'Image & Separator &
+                    M.Score_2'Image);
    end Send_Status_Message;
 
    function Receive_Status_Message return Status_Message is
@@ -47,14 +51,52 @@ package body Communication is
       Last := I - 1;
       Ret.Ball_Data.Pos.X := Float'Value(Recv_Buf.Content (First .. Last));
 
-      First := I + 1;
-      while I <= Recv_Buf.Length loop
+      I := I + 1;
+      First := I;
+      while I <= Recv_Buf.Length and then Recv_Buf.Content(I) /= Separator loop
          I := I + 1;
       end loop;
       Last := I - 1;
       Ret.Ball_Data.Pos.Y := Float'Value(Recv_Buf.Content (First .. Last));
 
+      I := I + 1;
+      First := I;
+      while I <= Recv_Buf.Length and then Recv_Buf.Content(I) /= Separator loop
+         I := I + 1;
+      end loop;
+      Last := I - 1;
+      Ret.Ball_Data.Direction.X := Float'Value(Recv_Buf.Content (First .. Last));
+
+      I := I + 1;
+      First := I;
+      while I <= Recv_Buf.Length and then Recv_Buf.Content(I) /= Separator loop
+         I := I + 1;
+      end loop;
+      Last := I - 1;
+      Ret.Ball_Data.Direction.Y := Float'Value(Recv_Buf.Content (First .. Last));
+
+      I := I + 1;
+      First := I;
+      while I <= Recv_Buf.Length and then Recv_Buf.Content(I) /= Separator loop
+         I := I + 1;
+      end loop;
+      Last := I - 1;
+      Ret.Score_1 := Natural'Value(Recv_Buf.Content (First .. Last));
+
+      I := I + 1;
+      First := I;
+      while I <= Recv_Buf.Length and then Recv_Buf.Content(I) /= Separator loop
+         I := I + 1;
+      end loop;
+      Last := I - 1;
+      Ret.Score_2 := Natural'Value(Recv_Buf.Content (First .. Last));
+
       return Ret;
+
+   exception
+      when E : others =>
+         Send_Debug (Exception_Message (E));
+         return Ret;
    end Receive_Status_Message;
 
    function Determine_Player_Number return Integer is
