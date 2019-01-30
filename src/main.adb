@@ -73,7 +73,7 @@ begin
    --  Initialize button
    User_Button.Initialize;
 
-   LCD_Std_Out.Set_Font (BMP_Fonts.Font8x8);
+   LCD_Std_Out.Set_Font (BMP_Fonts.Font16x24);
    LCD_Std_Out.Current_Background_Color := BG_Color;
 
    -- Initialize Coms
