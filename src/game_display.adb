@@ -1,3 +1,5 @@
+with hal.Framebuffer; use hal.framebuffer;
+
 package body Game_Display is
 
    procedure Draw_Background (Color : Bitmap_Color) is
@@ -6,13 +8,9 @@ package body Game_Display is
       Display.Hidden_Buffer(1).Fill;
    end Draw_Background;
 
-   procedure Draw_Score (Score : Natural) is
-      n : Integer := 12;
+   procedure Draw_Score (Score : Game.Score) is
    begin
-      for i in 1..n loop
-         LCD_Std_Out.Put_Line("");
-      end loop;
-      LCD_Std_Out.Put(Natural'Image(Score));
+      LCD_Std_Out.Put(1, 2, Score'Image);
    end Draw_Score;
 
    procedure Draw_Victory is

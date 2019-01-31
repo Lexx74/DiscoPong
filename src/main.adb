@@ -84,6 +84,8 @@ begin
 
       Ball.Draw;
 
+      Draw_Score(Game_Status.Scores(Player_No));
+
       --  Update screen
       Display.Update_Layer (1, Copy_Back => True);
 
