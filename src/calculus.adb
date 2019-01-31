@@ -6,7 +6,7 @@ package body Calculus is
    package Math is new Ada.Numerics.Generic_Elementary_Functions(Float);
 
    function Vector_To_Point(V: My_Vector) return Point is
-      ret : Point := (Natural(V.X), Natural(V.Y));
+      Ret : Point := (Natural(V.X), Natural(V.Y));
    begin
       return ret;
    end;

@@ -61,6 +61,7 @@ is
 
    Ball_Status : Status_Message;
    Has_Ball : Boolean;
+
 begin
 
    --  Initialize LCD
@@ -88,26 +89,22 @@ begin
 
    Has_Ball := Player_No = 1;
 
+
    loop
-      if User_Button.Has_Been_Pressed then
-         BG_Color := HAL.Bitmap.Dark_Orange;
-      end if;
-
       Draw_Background (BG_Color);
-      if Has_Ball then
+      if Player_No = 1 then
          Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Blue);
-
+      else
+         Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Red);
+      end if;
+      if Has_Ball then
          Ball.Update(Pad);
-
          Local_To_Global(Ball, GBall, Player_No);
-
          Ball_Status.Ball_Data := GBall;
          Send_Status_Message (Ball_Status);
       else
-         Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Red);
          Ball_Status := Receive_Status_Message;
          GBall := Ball_Status.Ball_Data;
-
          Global_To_Local(GBall, Ball, Player_No);
       end if;
 
@@ -124,5 +121,5 @@ begin
    end loop;
 exception
    when E : others =>
-      Send_Debug (Exception_Message (E) & "Has_Ball=" & Has_Ball'Image);
+      Send_Debug (Exception_Message (E));
 end Main;

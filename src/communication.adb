@@ -100,7 +100,7 @@ package body Communication is
 
    exception
       when E : others =>
-         Send_Debug (Exception_Message (E));
+         Send_Debug (Exception_Message (E) & "#" & Exception_Information (E));
          return Ret;
    end Receive_Status_Message;
 

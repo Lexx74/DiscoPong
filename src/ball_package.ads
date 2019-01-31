@@ -31,8 +31,10 @@ package Ball_Package is
       with Post => (This.Pos = Default_Pos and then This.Direction = Default_Direction);
 
    procedure Update (This : in out Local_Ball; Pad : Paddle)
-     with Pre  => (This.Pos.X in X_Range and This.Pos.Y in Y_Local_Range),
-          Post => (This.Pos.X in X_Range and This.Pos.Y in Y_Global_Range);
+     with Pre  => (This.Pos.X in X_Range
+                   and then This.Pos.Y in Y_Local_Range),
+          Post => (This.Pos.X in X_Range
+                   and then This.Pos.Y in Y_Global_Range);
 
    procedure Draw (This : Ball);
 
