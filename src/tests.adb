@@ -45,6 +45,47 @@ begin
 
    -- Test suite
 
+   -- Ball tests
+   Ball.Pos := (Radius, 250.0);
+   Ball.Direction := (-1.0, 0.0);
+   Update(Ball, Pad);
+   if Ball.Pos.X /= Radius + 1.0 or else Ball.Pos.Y /= 250.0
+      or else Ball.Direction.X /= 1.0 or else Ball.Direction.Y /= 0.0 then
+      LCD_Std_Out.Put_Line("Error Ball update bounce left");
+   end if;
+
+   Ball.Pos := (LCD_Natural_Width_f - Radius, 250.0);
+   Ball.Direction := (1.0, 0.0);
+   Update(Ball, Pad);
+   if Ball.Pos.X /= LCD_Natural_Width_f - Radius - 1.0 or else Ball.Pos.Y /= 250.0
+      or else Ball.Direction.X /= -1.0 or else Ball.Direction.Y /= 0.0 then
+      LCD_Std_Out.Put_Line("Error Ball update bounce right");
+   end if;
+
+   Ball.Pos := (LCD_Natural_Width_f / 2.0, Float(Paddle_Default_Y) + Radius);
+   Ball.Direction := (0.0, -1.0);
+   Update(Ball, Pad);
+   if Ball.Pos.X /= LCD_Natural_Width_f / 2.0
+      or else Ball.Pos.Y /= Float(Paddle_Default_Y) + Radius + 1.0
+      or else Ball.Direction.X /= 0.0 or else Ball.Direction.Y /= 1.0 then
+      LCD_Std_Out.Put_Line("Error Ball update bounce paddle");
+   end if;
+
+   -- Paddle tests
+   Set_X(Pad, 0);
+   if Get_X(Pad) /= Get_Min_X(Pad) then
+     LCD_Std_Out.Put_Line("Error Pad left");
+   end if;
+   Set_X(Pad, LCD_Natural_Width);
+   if Get_X(Pad) /= Get_Max_X(Pad) then
+     LCD_Std_Out.Put_Line("Error Pad right");
+   end if;
+
+   --LCD_Std_Out.Put_Line(Ball.Pos.X'Image);
+   --LCD_Std_Out.Put_Line(Ball.Pos.Y'Image);
+   --LCD_Std_Out.Put_Line(Ball.Direction.X'Image);
+   --LCD_Std_Out.Put_Line(Ball.Direction.Y'Image);
+
    LCD_Std_Out.Put_Line("All tests done");
 
    loop

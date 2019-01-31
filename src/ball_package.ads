@@ -61,4 +61,4 @@ private
                    and then This.Pos.X >= Float (Pad.Get_X - Pad.Get_Width / 2)
                    and then This.Pos.X <= Float (Pad.Get_X + Pad.Get_Width / 2));
 
-end Ball_Package; 
+end Ball_Package;
