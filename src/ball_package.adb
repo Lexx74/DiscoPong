@@ -10,7 +10,7 @@ package body Ball_Package is
 
    procedure Draw(This : Ball) is
    begin
-      Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.White);
+      Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Green);
       Display.Hidden_Buffer (1).Fill_Circle (Vector_To_Point(This.Pos), Integer(Radius));
    end Draw;
 
