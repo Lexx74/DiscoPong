@@ -58,7 +58,7 @@ private
 
    procedure Bounce_On_Paddle (This : in out Ball; Old_Ball : in out Ball; Pad : Paddle)
       with Pre => (This.Pos.Y < Float (Pad.Get_Y) + Radius
-                   and then This.Pos.X >= Float (Pad.Get_X - Pad.Get_Width / 2)
-                   and then This.Pos.X <= Float (Pad.Get_X + Pad.Get_Width / 2));
+          and then This.Pos.X + Radius >= Float (Pad.Get_Low_Edge_X)
+          and then This.Pos.X <= Float (Pad.Get_High_Edge_X) + Radius);
 
 end Ball_Package;

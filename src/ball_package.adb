@@ -70,8 +70,8 @@ package body Ball_Package is
       end if;
       if (This.Pos.Y < Float (Pad.Get_Y) + Radius
           and then Old_Ball.Pos.Y >= Float(Pad.Get_Y) + Radius
-          and then This.Pos.X >= Float (Pad.Get_Low_Edge_X)
-          and then This.Pos.X <= Float (Pad.Get_High_Edge_X)) then
+          and then This.Pos.X + Radius >= Float (Pad.Get_Low_Edge_X)
+          and then This.Pos.X <= Float (Pad.Get_High_Edge_X) + Radius) then
          This.Bounce_On_Paddle (Old_Ball, Pad);
          return True;
       end if;
