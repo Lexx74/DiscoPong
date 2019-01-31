@@ -21,3 +21,12 @@ make flash
 On the STM32F429 discovery board, the UART pins used are
 - UART_TX: PA9
 - UART_RX: PA10
+
+
+# Setup
+
+Connect the TX pin of each board to the RX pin of the other.
+Boot up both boards, and play 🙂!
+
+In case of crash, or freeze of one board, or if nothing appears on the screen of
+either board, reset the boards. In the latter case do it simultaneously.
