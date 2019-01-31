@@ -4,7 +4,7 @@ with HAL.Touch_Panel; use HAL.Touch_Panel;
 package Paddle_Package is
    type Paddle is tagged private;
 
-   Paddle_Default_Y : constant Natural := 50;
+   Paddle_Default_Y : constant Natural := 100;
    Paddle_Default_Width : constant Natural := 50;
    Paddle_Default_Thickness : constant Natural := 6;
 

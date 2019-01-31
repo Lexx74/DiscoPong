@@ -1,11 +1,21 @@
 with STM32.Board; use STM32.Board;
 with STM32.Device_Id; use STM32.Device_Id;
 with Ball_Package; use Ball_Package;
-with Peripherals_Nonblocking; use Peripherals_Nonblocking;
-with Serial_IO.Nonblocking; use Serial_IO.Nonblocking;
-with Message_Buffers; use Message_Buffers;
+with Peripherals; use Peripherals;
 with ball_package; use ball_package;
 with Game;
+
+with STM32;                        use STM32;
+with STM32.GPIO;                   use STM32.GPIO;
+with STM32.USARTs;                 use STM32.USARTs;
+
+with STM32.Device;                 use STM32.Device;
+
+with Ada.Synchronous_Task_Control; use Ada.Synchronous_Task_Control;
+
+with Peripherals;                  use Peripherals;
+with Serial_Port;                  use Serial_Port;
+
 
 package Communication is
 
@@ -17,18 +27,11 @@ package Communication is
    Terminator : constant Character := ';';
    Separator : constant Character := '#';
 
-   procedure Initialize_Communication
-      with Post => Initialized (COM);
-   procedure Send_Message (M : String)
-      with Pre => Initialized (COM);
-   procedure Send_Debug (M : String)
-      with Pre => Initialized (COM);
-   procedure Send_Status_Message (M : Status_Message)
-      with Pre => Initialized (COM);
-   function Receive_Status_Message(Ret : out Status_Message) return Boolean
-      with Pre => Initialized (COM);
-   function Determine_Player_Number return Integer
-      with Pre => Initialized (COM);
+   procedure Initialize_Communication;
+   procedure Send_Message (M : String);
+   procedure Send_Status_Message (M : Status_Message);
+   function Receive_Status_Message(Ret : out Status_Message) return Boolean;
+   function Determine_Player_Number return Integer;
 
    Same_Board_Id : exception;
    Connection_Timeout : exception;

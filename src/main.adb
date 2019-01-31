@@ -70,11 +70,19 @@ begin
          Local_To_Global(Ball, GBall, Player_No);
          Game_Status.Ball_Data := GBall;
          Send_Status_Message (Game_Status);
-      else
-         if Receive_Status_Message(Game_Status) then
-            GBall := Game_Status.Ball_Data;
-            Global_To_Local(GBall, Ball, Player_No);
+         if not Do_I_Have_Ball(GBall, Player_No) then
+            for i in 1 .. 2 loop
+               Send_Status_Message (Game_Status);
+               delay 0.01;
+            end loop;
          end if;
+      else
+         while not Receive_Status_Message(Game_Status) loop
+            null;
+         end loop;
+         GBall := Game_Status.Ball_Data;
+         Global_To_Local(GBall, Ball, Player_No);
+
       end if;
 
       Has_Ball := Do_I_Have_Ball(GBall, Player_No);
@@ -90,7 +98,4 @@ begin
       Display.Update_Layer (1, Copy_Back => True);
 
    end loop;
-   exception
-      when E : others =>
-         Send_Debug (Exception_Message (E) & "#" & Exception_Information(E));
 end Main;

@@ -106,6 +106,7 @@ package body Ball_Package is
       Ball_Angle : Float;
       New_Ball_Angle : Float;
       Norm : Float;
+      Norm_Max : constant Float := 25.0;
 
       Ratio_Before_Impact : Float;
       Ratio_After_Impact : Float;
@@ -128,7 +129,11 @@ package body Ball_Package is
       end if;
 
       This.Direction := Calculus.Angle_To_Direction(New_Ball_Angle);
-      Calculus.Mult_Vector(This.Direction, Norm * 1.1);
+      Norm := Norm * 1.1;
+      if Norm > Norm_Max then
+         Norm := Norm_Max;
+      end if;
+      Calculus.Mult_Vector(This.Direction, Norm);
       This.Pos := (Impact_X + This.Direction.X * Ratio_After_Impact,
                    Radius + Float (Pad.Get_Y) + This.Direction.Y * Ratio_After_Impact);
    end Bounce_On_Paddle;

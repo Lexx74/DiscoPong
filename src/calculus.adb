@@ -15,7 +15,7 @@ package body Calculus is
       Radius : Integer := LCD_Natural_Width / 2;
       F : Float := Float (Delta_X) / Float (Radius);
    begin
-      return Math.Arcsin(F) / 2.0;
+      return Math.Arcsin(F);
    end;
 
    function Angle_To_Direction(angle: Float) return My_Vector is
