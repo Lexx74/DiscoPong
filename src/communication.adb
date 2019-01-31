@@ -33,17 +33,16 @@ package body Communication is
                     M.Ball_Data.Pos.Y'Image & Separator &
                     M.Ball_Data.Direction.X'Image & Separator &
                     M.Ball_Data.Direction.Y'Image & Separator &
-                    M.Score_1'Image & Separator &
-                    M.Score_2'Image);
+                    M.Scores(1)'Image & Separator &
+                    M.Scores(2)'Image);
    end Send_Status_Message;
 
-   function Receive_Status_Message return Status_Message is
+   function Receive_Status_Message(Ret : out Status_Message) return Boolean is
       Recv_Buf : aliased Message (Physical_Size => 1024);
       Reached_Term : Boolean := False;
       First : Integer := 1;
       Last : Integer := 1;
       I : Integer := 1;
-      Ret : Status_Message;
    begin
       Set_Terminator (Recv_Buf, Terminator);
       Get (COM, Recv_Buf'Unchecked_Access);
@@ -86,7 +85,7 @@ package body Communication is
          I := I + 1;
       end loop;
       Last := I - 1;
-      Ret.Score_1 := Natural'Value(Recv_Buf.Content (First .. Last));
+      Ret.Scores(1) := Game.Score'Value(Recv_Buf.Content (First .. Last));
 
       I := I + 1;
       First := I;
@@ -94,14 +93,14 @@ package body Communication is
          I := I + 1;
       end loop;
       Last := I - 1;
-      Ret.Score_2 := Natural'Value(Recv_Buf.Content (First .. Last));
+      Ret.Scores(2) := Game.Score'Value(Recv_Buf.Content (First .. Last));
 
-      return Ret;
+      return Ret.Ball_Data.Pos.X in X_Range and then Ret.Ball_Data.Pos.Y in Y_Global_Range;
 
    exception
       when E : others =>
          Send_Debug (Exception_Message (E) & "#" & Exception_Information (E));
-         return Ret;
+         return False;
    end Receive_Status_Message;
 
    function Determine_Player_Number return Integer is

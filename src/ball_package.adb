@@ -14,13 +14,13 @@ package body Ball_Package is
       Display.Hidden_Buffer (1).Fill_Circle (Vector_To_Point(This.Pos), Integer(Radius));
    end Draw;
 
-   procedure Update(This : in out Local_Ball; Pad : Paddle) is
+   procedure Update(This : in out Local_Ball; Pad : Paddle; Other_Score : in out Score) is
       Old_Ball : Ball := This;
    begin
      This.Pos.x := This.Pos.x + This.Direction.x;
      This.Pos.y := This.Pos.y + This.Direction.y;
 
-      while This.Bounce(Old_Ball, Pad) loop
+      while This.Bounce(Old_Ball, Pad, Other_Score) loop
         null;
       end loop;
    end Update;
@@ -58,14 +58,14 @@ package body Ball_Package is
       end if;
    end Do_I_Have_Ball;
 
-   function Bounce(This : in out Ball; Old_Ball : in out Ball; Pad : Paddle) return Boolean is
+   function Bounce(This : in out Ball; Old_Ball : in out Ball; Pad : Paddle; Other_Score : in out Score) return Boolean is
    begin
       if (This.Pos.X + Radius > LCD_Natural_Width_f or else This.Pos.X < Radius) then
          This.Bounce_On_Edge (Old_Ball);
          return True;
       end if;
       if (This.Pos.Y < Radius and then This.Direction.y < 0.0) then
-         This.Bounce_On_Goal_Line;
+         This.Bounce_On_Goal_Line(Other_Score);
         return True;
       end if;
       if (This.Pos.Y < Float (Pad.Get_Y) + Radius
@@ -78,9 +78,10 @@ package body Ball_Package is
       return False;
    end Bounce;
 
-   procedure Bounce_On_Goal_Line (This : in out Ball) is
+   procedure Bounce_On_Goal_Line (This : in out Ball; Other_Score : in out Score) is
    begin
       This.Reset_Ball;
+      Other_Score := Other_Score + 1;
    end Bounce_On_Goal_Line;
 
    procedure Bounce_On_Edge (This : in out Ball; Old_Ball : in out Ball) is

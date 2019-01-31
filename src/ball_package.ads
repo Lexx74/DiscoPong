@@ -2,6 +2,7 @@ with STM32.Board; use STM32.Board;
 with Calculus; use Calculus;
 with Paddle_Package; use Paddle_Package;
 with HAL.Bitmap; use HAL.Bitmap;
+with Game; use Game;
 
 package Ball_Package is
    pragma Assertion_Policy(Check);
@@ -31,7 +32,7 @@ package Ball_Package is
    procedure Reset_Ball (This : in out Ball)
       with Post => (This.Pos = Default_Pos and then This.Direction = Default_Direction);
 
-   procedure Update (This : in out Local_Ball; Pad : Paddle)
+   procedure Update (This : in out Local_Ball; Pad : Paddle; Other_Score : in out Score)
      with Pre  => (This.Pos.X in X_Range
                    and then This.Pos.Y in Y_Local_Range),
           Post => (This.Pos.X in X_Range
@@ -47,8 +48,8 @@ package Ball_Package is
 
 private
 
-   function Bounce (This : in out Ball; Old_Ball : in out Ball; Pad : Paddle) return Boolean;
-   procedure Bounce_On_Goal_Line (This : in out Ball)
+   function Bounce (This : in out Ball; Old_Ball : in out Ball; Pad : Paddle; Other_Score : in out Score) return Boolean;
+   procedure Bounce_On_Goal_Line (This : in out Ball; Other_Score : in out Score)
       with Pre => (This.Pos.Y < Radius and then This.Direction.Y < 0.0),
            Post => This.Pos = Default_Pos and then This.Direction = Default_Direction;
 

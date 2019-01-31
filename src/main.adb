@@ -25,7 +25,7 @@ is
    Pad : Paddle;
    Player_No : Integer;
 
-   Ball_Status : Status_Message;
+   Game_Status : Status_Message;
    Has_Ball : Boolean;
 
 begin
@@ -55,6 +55,8 @@ begin
 
    Has_Ball := Player_No = 1;
 
+   Game_Status.Scores(1) := 0;
+   Game_Status.Scores(2) := 0;
 
    loop
       Draw_Background (BG_Color);
@@ -64,14 +66,15 @@ begin
          Display.Hidden_Buffer (1).Set_Source (HAL.Bitmap.Red);
       end if;
       if Has_Ball then
-         Ball.Update(Pad);
+         Ball.Update(Pad, Game_Status.Scores(3 - Player_No));
          Local_To_Global(Ball, GBall, Player_No);
-         Ball_Status.Ball_Data := GBall;
-         Send_Status_Message (Ball_Status);
+         Game_Status.Ball_Data := GBall;
+         Send_Status_Message (Game_Status);
       else
-         Ball_Status := Receive_Status_Message;
-         GBall := Ball_Status.Ball_Data;
-         Global_To_Local(GBall, Ball, Player_No);
+         if Receive_Status_Message(Game_Status) then
+            GBall := Game_Status.Ball_Data;
+            Global_To_Local(GBall, Ball, Player_No);
+         end if;
       end if;
 
       Has_Ball := Do_I_Have_Ball(GBall, Player_No);
@@ -85,7 +88,7 @@ begin
       Display.Update_Layer (1, Copy_Back => True);
 
    end loop;
-exception
-   when E : others =>
-      Send_Debug (Exception_Message (E));
+   exception
+      when E : others =>
+         Send_Debug (Exception_Message (E) & "#" & Exception_Information(E));
 end Main;

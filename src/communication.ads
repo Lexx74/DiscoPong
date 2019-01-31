@@ -4,13 +4,14 @@ with Ball_Package; use Ball_Package;
 with Peripherals_Nonblocking; use Peripherals_Nonblocking;
 with Serial_IO.Nonblocking; use Serial_IO.Nonblocking;
 with Message_Buffers; use Message_Buffers;
+with ball_package; use ball_package;
+with Game;
 
 package Communication is
 
    type Status_Message is tagged record
       Ball_Data : Ball;
-      Score_1 : Natural;
-      Score_2 : Natural;
+      Scores : Game.Scores;
    end record;
 
    Terminator : constant Character := ';';
@@ -24,7 +25,7 @@ package Communication is
       with Pre => Initialized (COM);
    procedure Send_Status_Message (M : Status_Message)
       with Pre => Initialized (COM);
-   function Receive_Status_Message return Status_Message
+   function Receive_Status_Message(Ret : out Status_Message) return Boolean
       with Pre => Initialized (COM);
    function Determine_Player_Number return Integer
       with Pre => Initialized (COM);
