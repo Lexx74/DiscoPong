@@ -1,6 +1,7 @@
 with STM32.Board; use STM32.Board;
 with Calculus; use Calculus;
 with Paddle_Package; use Paddle_Package;
+with HAL.Bitmap; use HAL.Bitmap;
 
 package Ball_Package is
    pragma Assertion_Policy(Check);
