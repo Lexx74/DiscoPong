@@ -5,6 +5,8 @@ with LCD_Std_Out;
 with Game;
 
 package Game_Display is
+   Text_X : constant Natural := 50;
+   Text_Y : constant Natural := 200;
    procedure Draw_Background (Color : Bitmap_Color)
       with Pre => Display.Initialized;
 

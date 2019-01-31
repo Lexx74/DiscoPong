@@ -17,13 +17,13 @@ package body Game_Display is
      s : string := "You Win!";
    begin
       LCD_Std_Out.Clear_Screen;
-      LCD_Std_Out.Put_Line(s);
+      LCD_Std_Out.Put(Text_X, Text_Y, s);
    end Draw_Victory;
 
    procedure Draw_Lose is
       s : string := "You Lose!";
    begin
       LCD_Std_Out.Clear_Screen;
-      LCD_Std_Out.Put_Line(s);
+      LCD_Std_Out.Put(Text_X, Text_Y, s);
    end Draw_Lose;
 end Game_Display;

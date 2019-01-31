@@ -13,6 +13,7 @@ with Paddle_Package; use Paddle_Package;
 with Game_Display; use Game_Display;
 with Communication; use Communication;
 with Ada.Exceptions;  use Ada.Exceptions;
+with Game; use Game;
 
 procedure Main
 is
@@ -27,6 +28,8 @@ is
 
    Game_Status : Status_Message;
    Has_Ball : Boolean;
+
+   Win_Score : Score := 3;
 
 begin
 
@@ -91,6 +94,19 @@ begin
       Pad.Draw;
 
       Ball.Draw;
+
+      if Game_Status.Scores(Player_No) = Win_Score or else Game_Status.Scores(3 - Player_No) = Win_Score then
+         if Game_Status.Scores(Player_No) = Win_Score then
+            Draw_Victory;
+         else
+            Draw_Lose;
+         end if;
+         for i in Game_Status.Scores'Range loop
+            Game_Status.Scores(i) := 0;
+            Game_Status.Ball_Data.Reset_Ball;
+         end loop;
+         delay 2.0;
+      end if;
 
       Draw_Score(Game_Status.Scores(Player_No));
 
