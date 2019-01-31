@@ -13,7 +13,7 @@ package Ball_Package is
    Radius : constant Float := 10.0;
 
    Default_Pos : constant My_Vector := (Float(LCD_Natural_Width / 2), Float(250));
-   Default_Direction : constant My_Vector := (0.0, -3.0);
+   Default_Direction : constant My_Vector := (0.0, -5.0);
 
    subtype X_Range is Float range Radius .. LCD_Natural_Width_f - Radius;
 

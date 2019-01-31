@@ -128,7 +128,7 @@ package body Ball_Package is
       end if;
 
       This.Direction := Calculus.Angle_To_Direction(New_Ball_Angle);
-      Calculus.Mult_Vector(This.Direction, Norm);
+      Calculus.Mult_Vector(This.Direction, Norm * 1.1);
       This.Pos := (Impact_X + This.Direction.X * Ratio_After_Impact,
                    Radius + Float (Pad.Get_Y) + This.Direction.Y * Ratio_After_Impact);
    end Bounce_On_Paddle;
